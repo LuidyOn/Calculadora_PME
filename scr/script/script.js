@@ -1,0 +1,149 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // --- NOVO: LÓGICA DE DIAS ÚTEIS ---
+    
+    // Lista de feriados nacionais fixos (formato AAAA-MM-DD).
+    // Feriados móveis como Carnaval e Corpus Christi precisam ser adicionados anualmente.
+    const feriadosNacionais = [
+        // 2025
+        "2025-01-01", // Confraternização Universal
+        "2025-03-03", // Carnaval (Exemplo - data móvel)
+        "2025-03-04", // Carnaval (Exemplo - data móvel)
+        "2025-04-18", // Paixão de Cristo (Exemplo - data móvel)
+        "2025-04-21", // Tiradentes
+        "2025-05-01", // Dia do Trabalho
+        "2025-06-19", // Corpus Christi (Exemplo - data móvel)
+        "2025-09-07", // Independência do Brasil
+        "2025-10-12", // Nossa Senhora Aparecida
+        "2025-11-02", // Finados
+        "2025-11-15", // Proclamação da República
+        "2025-11-20", // Dia da Consciência Negra
+        "2025-12-25", // Natal
+        // Adicione outros anos e feriados conforme necessário
+        "2026-01-01", "2026-04-03", "2026-04-21", "2026-05-01", "2026-06-04", 
+        "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25",
+    ];
+
+    // Função que verifica se uma data é um dia útil
+    function isDiaUtil(date) {
+        const diaDaSemana = date.getDay(); // 0 = Domingo, 6 = Sábado
+        if (diaDaSemana === 0 || diaDaSemana === 6) {
+            return false; // É fim de semana
+        }
+
+        const dataFormatada = date.toISOString().slice(0, 10);
+        if (feriadosNacionais.includes(dataFormatada)) {
+            return false; // É feriado
+        }
+
+        return true;
+    }
+
+    // Função que ajusta uma data para o próximo dia útil, se necessário
+    function ajustarParaProximoDiaUtil(date) {
+        let dataAjustada = new Date(date);
+        while (!isDiaUtil(dataAjustada)) {
+            dataAjustada.setDate(dataAjustada.getDate() + 1);
+        }
+        return dataAjustada;
+    }
+    
+    // --- FIM DA LÓGICA DE DIAS ÚTEIS ---
+
+
+    const inputs = document.querySelectorAll('#valorBem, #percFinanciado, #parcelas, #taxaAA, #liberacao, #primeiroVencimento, #periodicidade');
+
+    inputs.forEach(input => {
+        input.addEventListener('input', calcularTudo);
+    });
+
+    const formatCurrency = (value) => {
+        return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+    
+    const formatDate = (date) => {
+        if (isNaN(date.getTime())) return 'Data inválida';
+        return date.toLocaleString('pt-BR');
+    };
+
+    function calcularTudo() {
+        const valorBem = parseFloat(document.getElementById('valorBem').value) || 0;
+        const percFinanciado = parseFloat(document.getElementById('percFinanciado').value) || 0;
+        const numParcelas = parseInt(document.getElementById('parcelas').value) || 1;
+        const taxaAA = parseFloat(document.getElementById('taxaAA').value) / 100 || 0;
+        const dataLiberacao = new Date(document.getElementById('liberacao').value + 'T00:00:00');
+        const dataPrimeiroVencimento = new Date(document.getElementById('primeiroVencimento').value + 'T00:00:00');
+        const periodicidade = document.getElementById('periodicidade').value;
+        
+        const valorFinanciado = valorBem * (percFinanciado / 100);
+        const principalPorParcela = numParcelas > 0 ? valorFinanciado / numParcelas : 0;
+
+        document.getElementById('valorFinanciado').textContent = formatCurrency(valorFinanciado);
+        document.getElementById('parcelasPrincipal').textContent = numParcelas;
+        document.getElementById('total-principal').textContent = formatCurrency(valorFinanciado);
+        
+        const tbody = document.getElementById('amortization-body');
+        tbody.innerHTML = '';
+        
+        if (numParcelas <= 0 || isNaN(dataLiberacao.getTime()) || isNaN(dataPrimeiroVencimento.getTime())) {
+            document.getElementById('prestacao').textContent = formatCurrency(0);
+            document.getElementById('total-juros').textContent = formatCurrency(0);
+            document.getElementById('total-geral').textContent = formatCurrency(0);
+            return;
+        }
+
+        let saldoDevedor = valorFinanciado;
+        let totalJuros = 0;
+        let dataVencimentoAnterior = dataLiberacao;
+
+        for (let i = 1; i <= numParcelas; i++) {
+            let dataVencimentoCalculada;
+            
+            if (i === 1) {
+                dataVencimentoCalculada = new Date(dataPrimeiroVencimento);
+            } else {
+                dataVencimentoCalculada = new Date(dataVencimentoAnterior);
+                if (periodicidade === 'ANUAL') {
+                    dataVencimentoCalculada.setFullYear(dataVencimentoAnterior.getFullYear() + 1);
+                } else { // MENSAL
+                    dataVencimentoCalculada.setMonth(dataVencimentoAnterior.getMonth() + 1);
+                }
+            }
+            
+            // --- ALTERAÇÃO PRINCIPAL AQUI ---
+            // Ajusta a data de vencimento para o próximo dia útil, se necessário.
+            const dataVencimentoAtual = ajustarParaProximoDiaUtil(dataVencimentoCalculada);
+
+            const diffTime = Math.abs(dataVencimentoAtual - dataVencimentoAnterior);
+            const diasCorridos = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            const juros = saldoDevedor * (taxaAA / 365) * diasCorridos;
+            const totalParcela = principalPorParcela + juros;
+            
+            totalJuros += juros;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${i}</td>
+                <td>${formatDate(dataVencimentoAtual)}</td>
+                <td>${diasCorridos}</td>
+                <td>${formatCurrency(saldoDevedor)}</td>
+                <td>${formatCurrency(juros)}</td>
+                <td>${formatCurrency(principalPorParcela)}</td>
+                <td>${formatCurrency(totalParcela)}</td>
+            `;
+            tbody.appendChild(row);
+
+            saldoDevedor -= principalPorParcela;
+            dataVencimentoAnterior = dataVencimentoAtual;
+
+            if (i === 1) {
+                 document.getElementById('prestacao').textContent = formatCurrency(totalParcela);
+            }
+        }
+
+        document.getElementById('total-juros').textContent = formatCurrency(totalJuros);
+        document.getElementById('total-geral').textContent = formatCurrency(valorFinanciado + totalJuros);
+    }
+    
+    calcularTudo();
+});

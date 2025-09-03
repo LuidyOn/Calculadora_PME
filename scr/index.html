@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Financiamento</title>
+    <link rel="stylesheet" href="/style/style.css">
+</head>
+<body>
+
+    <div class="simulator-container">
+        <header>
+            <div class="logo">
+                <span class="logo-main">CNH INDUSTRIAL</span>
+                <span class="logo-sub">CAPITAL</span>
+            </div>
+            <h1>SIMULADOR PRONAF *</h1>
+        </header>
+
+        <form id="loan-form">
+            <div class="form-grid">
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="tipoFinanciamento">TIPO DE FINANCIAMENTO:</label>
+                        <input type="text" id="tipoFinanciamento" value="PJ">
+                    </div>
+                    <div class="form-group">
+                        <label for="liberacao">LIBERAÇÃO:</label>
+                        <input type="date" id="liberacao" value="2025-07-15">
+                    </div>
+                    <div class="form-group">
+                        <label for="produto">PRODUTO:</label>
+                        <input type="text" id="produto" value="AG">
+                    </div>
+                     <div class="form-group">
+                        <label for="empresa">EMPRESA:</label>
+                        <input type="text" id="empresa" value="GDE">
+                    </div>
+                    <div class="form-group">
+                        <label for="valorBem">VALOR DO BEM:</label>
+                        <input type="number" id="valorBem" value="100000.00" step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="percFinanciado">% FINANCIADO:</label>
+                        <input type="number" id="percFinanciado" value="100">
+                        <span class="status-ok">OK</span>
+                    </div>
+                    <div class="form-group read-only">
+                        <label>VALOR FINANCIADO:</label>
+                        <span id="valorFinanciado">100.000,00</span>
+                    </div>
+                    <div class="form-group read-only">
+                        <label>IOF:</label>
+                        <span>-</span>
+                    </div>
+                </div>
+
+                <div class="form-column">
+                     <div class="form-group">
+                        <label for="periodicidade">PERIODICIDADE:</label>
+                        <select id="periodicidade">
+                            <option value="ANUAL" selected>ANUAL</option>
+                            <option value="MENSAL">MENSAL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="parcelas">PARCELAS:</label>
+                        <input type="number" id="parcelas" value="7">
+                    </div>
+                    <div class="form-group">
+                        <label for="taxaAA">TAXA (A.A%):</label>
+                        <input type="number" id="taxaAA" value="5.00" step="0.1">
+                    </div>
+                    <div class="form-group read-only">
+                        <label>CET (A.A.%):</label>
+                        <span id="cetAA">5,00%</span>
+                    </div>
+                    <div class="form-group read-only">
+                        <label>PRESTAÇÃO (1ª):</label>
+                        <span id="prestacao">18.433,03</span>
+                    </div>
+                    <div class="form-group read-only">
+                        <label>PARCELAS DE PRINCIPAL:</label>
+                        <span id="parcelasPrincipal">7</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                 <div class="form-group">
+                    <label for="primeiroVencimento">PRIMEIRO VENCIMENTO:</label>
+                    <input type="date" id="primeiroVencimento" value="2026-05-15">
+                </div>
+                <div class="form-group-inline">
+                    <label>CARÊNCIA (EM MESES)</label>
+                    <span>Até 14 meses</span>
+                    <input type="number" id="carencia" value="10" readonly> </div>
+            </div>
+        </form>
+
+        <div class="observations">
+            <p><strong>**OBSERVAÇÕES**</strong></p>
+            <ul>
+                <li>O fluxo apresenta valores aproximados, que poderão variar de acordo com cada operação e o período de carência pactuado.</li>
+                <li>Os valores apresentados não são vinculativos.</li>
+                <li>Simulação sujeita a aprovação de crédito conforme política do Banco CNHI Capital.</li>
+                <li>Os campos em cinza devem ser preenchidos para completa exibição do fluxo.</li>
+                <li>As condições comerciais disponíveis informadas nesta proposta estão sujeitas a alteração a qualquer momento e sem aviso prévio.</li>
+            </ul>
+        </div>
+
+        <div class="table-wrapper">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PARCELA</th>
+                            <th>VENCIMENTO</th>
+                            <th>DIAS</th>
+                            <th>SALDO DEVEDOR</th>
+                            <th>JUROS</th>
+                            <th>PRINCIPAL</th>
+                            <th>TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortization-body">
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4"><strong>TOTAL</strong></td>
+                            <td id="total-juros"></td>
+                            <td id="total-principal"></td>
+                            <td id="total-geral"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="/script/script.js"></script>
+</body>
+</html>

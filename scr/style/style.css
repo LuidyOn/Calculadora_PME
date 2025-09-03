@@ -1,0 +1,179 @@
+/* --- GERAL --- */
+:root {
+    --primary-blue: #004a99;
+    --dark-blue: #002d5c;
+    --accent-yellow: #ffc107;
+    --light-gray: #f2f2f2;
+    --text-color: #333;
+    --border-color: #ccc;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e9ecef;
+    color: var(--text-color);
+    margin: 0;
+    padding: 10px; /* Reduzido para mobile */
+    font-size: 14px;
+}
+
+.simulator-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* --- CABEÇALHO --- */
+header {
+    display: flex;
+    flex-direction: column; /* Empilha no mobile e expande no desktop */
+    align-items: center;
+    border-bottom: 2px solid var(--light-gray);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.logo-main {
+    color: var(--primary-blue);
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.logo-sub {
+    color: var(--accent-yellow);
+    font-weight: bold;
+    font-size: 16px;
+}
+
+header h1 {
+    width: 100%;
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 10px;
+    margin: 0;
+    font-size: 1.2em; /* Ajustado */
+    border-radius: 5px;
+}
+
+/* --- FORMULÁRIO --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Coluna única por padrão (mobile-first) */
+    gap: 0 40px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.form-group input, .form-group span, .form-group select {
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1em;
+    width: 100%;
+    box-sizing: border-box; /* Garante que padding não afete a largura */
+}
+
+.form-group input, .form-group select {
+    background-color: var(--light-gray);
+}
+
+.form-group input[type="number"] {
+    text-align: right;
+}
+
+.form-group.read-only span {
+    background-color: transparent;
+    border: none;
+    padding-left: 0;
+    padding-right: 8px; /* Adicionado para alinhar */
+    font-weight: bold;
+    text-align: right;
+}
+
+.status-ok {
+    color: #28a745;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column; /* Empilha no mobile */
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid var(--light-gray);
+}
+
+.form-group-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--light-gray);
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.form-group-inline label { font-weight: bold; }
+.form-group-inline input { width: 60px; }
+
+/* --- OBSERVAÇÕES --- */
+.observations {
+    border: 1px solid var(--primary-blue);
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+
+.observations p {
+    margin: 0 0 10px 0;
+    color: var(--primary-blue);
+}
+
+.observations ul { margin: 0; padding-left: 20px; font-size: 0.9em; color: #666; }
+
+/* --- TABELA --- */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto; /* Permite rolagem horizontal */
+    margin-top: 20px;
+}
+.table-container { min-width: 800px; /* Força a rolagem em telas pequenas */ }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; /* Impede quebra de linha */}
+thead th { background-color: var(--dark-blue); color: white; }
+tbody tr:nth-child(even) { background-color: var(--light-gray); }
+tfoot { font-weight: bold; }
+th:nth-child(n+3), td:nth-child(n+3) { text-align: right; }
+
+
+/* --- RESPONSIVIDADE (DESKTOP) --- */
+@media (min-width: 768px) {
+    body { padding: 20px; }
+    header { flex-direction: row; text-align: left; }
+    .logo { margin-bottom: 0; }
+    header h1 { margin: 0 0 0 20px; font-size: 1.5em; }
+    .form-grid { grid-template-columns: 1fr 1fr; } /* Duas colunas em telas maiores */
+    .form-row { flex-direction: row; justify-content: space-between; align-items: flex-end; }
+    .form-group-inline { margin-top: 0; }
+}
