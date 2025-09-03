@@ -1,44 +1,40 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- NOVO: LÓGICA DE DIAS ÚTEIS ---
-    
-    // Lista de feriados nacionais fixos (formato AAAA-MM-DD).
-    // Feriados móveis como Carnaval e Corpus Christi precisam ser adicionados anualmente.
+    // --- NOVO: PREENCHER DATA DE LIBERAÇÃO AUTOMATICAMENTE ---
+    function setInitialDate() {
+        const liberacaoInput = document.getElementById('liberacao');
+        const today = new Date();
+        
+        // Formata a data para o padrão YYYY-MM-DD exigido pelo input type="date"
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); // Meses são de 0-11, então +1
+        const dd = String(today.getDate()).padStart(2, '0');
+        
+        const formattedToday = `${yyyy}-${mm}-${dd}`;
+        
+        // Define o valor do campo
+        liberacaoInput.value = formattedToday;
+    }
+    // --- FIM DO BLOCO NOVO ---
+
+
+    // --- LÓGICA DE DIAS ÚTEIS ---
     const feriadosNacionais = [
         // 2025
-        "2025-01-01", // Confraternização Universal
-        "2025-03-03", // Carnaval (Exemplo - data móvel)
-        "2025-03-04", // Carnaval (Exemplo - data móvel)
-        "2025-04-18", // Paixão de Cristo (Exemplo - data móvel)
-        "2025-04-21", // Tiradentes
-        "2025-05-01", // Dia do Trabalho
-        "2025-06-19", // Corpus Christi (Exemplo - data móvel)
-        "2025-09-07", // Independência do Brasil
-        "2025-10-12", // Nossa Senhora Aparecida
-        "2025-11-02", // Finados
-        "2025-11-15", // Proclamação da República
-        "2025-11-20", // Dia da Consciência Negra
-        "2025-12-25", // Natal
-        // Adicione outros anos e feriados conforme necessário
-        "2026-01-01", "2026-04-03", "2026-04-21", "2026-05-01", "2026-06-04", 
-        "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25",
+        "2025-01-01", "2025-03-03", "2025-03-04", "2025-04-18", "2025-04-21", "2025-05-01", 
+        "2025-06-19", "2025-09-07", "2025-10-12", "2025-11-02", "2025-11-15", "2025-11-20", "2025-12-25",
+        // 2026
+        "2026-01-01", "2026-04-03", "2026-04-21", "2026-05-01", "2026-06-04", "2026-09-07", 
+        "2026-10-12", "2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25",
     ];
 
-    // Função que verifica se uma data é um dia útil
     function isDiaUtil(date) {
-        const diaDaSemana = date.getDay(); // 0 = Domingo, 6 = Sábado
-        if (diaDaSemana === 0 || diaDaSemana === 6) {
-            return false; // É fim de semana
-        }
-
+        const diaDaSemana = date.getDay();
+        if (diaDaSemana === 0 || diaDaSemana === 6) return false;
         const dataFormatada = date.toISOString().slice(0, 10);
-        if (feriadosNacionais.includes(dataFormatada)) {
-            return false; // É feriado
-        }
-
+        if (feriadosNacionais.includes(dataFormatada)) return false;
         return true;
     }
 
-    // Função que ajusta uma data para o próximo dia útil, se necessário
     function ajustarParaProximoDiaUtil(date) {
         let dataAjustada = new Date(date);
         while (!isDiaUtil(dataAjustada)) {
@@ -48,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- FIM DA LÓGICA DE DIAS ÚTEIS ---
-
 
     const inputs = document.querySelectorAll('#valorBem, #percFinanciado, #parcelas, #taxaAA, #liberacao, #primeiroVencimento, #periodicidade');
 
@@ -62,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const formatDate = (date) => {
         if (isNaN(date.getTime())) return 'Data inválida';
-        return date.toLocaleString('pt-BR');
+        return date.toLocaleDateString('pt-BR');
     };
 
     function calcularTudo() {
@@ -104,15 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 dataVencimentoCalculada = new Date(dataVencimentoAnterior);
                 if (periodicidade === 'ANUAL') {
                     dataVencimentoCalculada.setFullYear(dataVencimentoAnterior.getFullYear() + 1);
-                } else { // MENSAL
+                } else {
                     dataVencimentoCalculada.setMonth(dataVencimentoAnterior.getMonth() + 1);
                 }
             }
             
-            // --- ALTERAÇÃO PRINCIPAL AQUI ---
-            // Ajusta a data de vencimento para o próximo dia útil, se necessário.
             const dataVencimentoAtual = ajustarParaProximoDiaUtil(dataVencimentoCalculada);
-
             const diffTime = Math.abs(dataVencimentoAtual - dataVencimentoAnterior);
             const diasCorridos = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
@@ -145,5 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('total-geral').textContent = formatCurrency(valorFinanciado + totalJuros);
     }
     
-    calcularTudo();
+    // Executa as funções iniciais no carregamento da página
+    setInitialDate(); // Define a data de hoje no campo de liberação
+    calcularTudo(); // Roda o cálculo inicial com os valores padrão
 });
