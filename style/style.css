@@ -7,96 +7,43 @@
     --text-color: #333;
     --border-color: #ccc;
 }
-
 body {
-    font-family: Arial, sans-serif;
-    background-color: #e9ecef;
-    color: var(--text-color);
-    margin: 0;
-    padding: 10px;
-    font-size: 14px;
+    font-family: Arial, sans-serif; background-color: #e9ecef; color: var(--text-color);
+    margin: 0; padding: 10px; font-size: 14px;
 }
-
 .simulator-container {
-    max-width: 900px;
-    margin: 0 auto;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-width: 900px; margin: 0 auto; background-color: #fff;
+    padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
-
 /* --- CABEÇALHO --- */
 header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-bottom: 2px solid var(--light-gray);
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-    text-align: center;
+    display: flex; flex-direction: column; align-items: center; border-bottom: 2px solid var(--light-gray);
+    padding-bottom: 15px; margin-bottom: 20px; text-align: center;
 }
-
-.logo {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
-}
-
+.logo { display: flex; flex-direction: column; margin-bottom: 10px; }
 .logo-main { color: var(--primary-blue); font-weight: bold; font-size: 20px; }
 .logo-sub { color: var(--accent-yellow); font-weight: bold; font-size: 16px; }
-
-/* SUGESTÃO 2: Estilos para o Seletor de Calculadora */
 .calculator-selector {
-    position: relative;
-    width: 100%;
-    background-color: var(--primary-blue);
-    color: white;
-    padding: 10px;
-    margin: 0;
-    font-size: 1.2em;
-    font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
-    box-sizing: border-box;
+    position: relative; width: 100%; background-color: var(--primary-blue); color: white;
+    padding: 10px; margin: 0; font-size: 1.2em; font-weight: bold;
+    border-radius: 5px; cursor: pointer; box-sizing: border-box;
 }
 .calculator-dropdown {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: 0 0 5px 5px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    z-index: 10;
+    display: none; position: absolute; top: 100%; left: 0; right: 0; background-color: #fff;
+    border: 1px solid var(--border-color); border-radius: 0 0 5px 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 10;
 }
-.calculator-dropdown a {
-    display: block;
-    padding: 10px 15px;
-    color: var(--dark-blue);
-    text-decoration: none;
-    font-size: 0.9em;
-}
-.calculator-dropdown a:hover {
-    background-color: var(--light-gray);
-}
-.calculator-selector:hover .calculator-dropdown {
-    display: block;
-}
+.calculator-dropdown a { display: block; padding: 10px 15px; color: var(--dark-blue); text-decoration: none; font-size: 0.9em; }
+.calculator-dropdown a:hover { background-color: var(--light-gray); }
+.calculator-selector:hover .calculator-dropdown { display: block; }
 
 /* --- FORMULÁRIO --- */
 .form-grid { display: grid; grid-template-columns: 1fr; gap: 0 40px; }
 .form-group { display: flex; flex-direction: column; margin-bottom: 12px; }
 .form-group label { font-weight: bold; margin-bottom: 5px; color: #555; }
 .form-group input, .form-group span, .form-group select {
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 1em;
-    width: 100%;
-    box-sizing: border-box;
+    padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;
+    font-size: 1em; width: 100%; box-sizing: border-box;
 }
 .form-group input, .form-group select { background-color: var(--light-gray); }
 .form-group input[type="text"], .form-group input[type="number"] { text-align: right; }
@@ -104,9 +51,9 @@ header {
     background-color: transparent; border: none; padding-left: 0; padding-right: 8px;
     font-weight: bold; text-align: right;
 }
-.status-ok { color: #28a745; font-weight: bold; margin-left: 10px; }
 .form-row {
-    display: flex; flex-direction: column; margin-top: 20px; padding-top: 10px; border-top: 1px solid var(--light-gray);
+    display: flex; flex-direction: column; margin-top: 20px;
+    padding-top: 10px; border-top: 1px solid var(--light-gray);
 }
 .form-group-inline {
     display: flex; align-items: center; gap: 10px; background-color: var(--light-gray);
@@ -115,10 +62,19 @@ header {
 .form-group-inline label { font-weight: bold; }
 .form-group-inline input { width: 60px; }
 
-/* --- OBSERVAÇÕES E TABELA --- */
+/* --- AÇÕES, OBSERVAÇÕES E TABELA --- */
+.actions { display: flex; justify-content: flex-end; margin: 20px 0 0 0; }
+#btn-gerar-pdf {
+    background-color: var(--primary-blue); color: white; font-weight: bold; font-size: 1em;
+    border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;
+}
+#btn-gerar-pdf:hover { background-color: var(--dark-blue); }
+#btn-gerar-pdf:disabled { background-color: #aaa; cursor: not-allowed; }
+
 .observations { border: 1px solid var(--primary-blue); padding: 15px; margin-top: 20px; border-radius: 5px; }
 .observations p { margin: 0 0 10px 0; color: var(--primary-blue); }
 .observations ul { margin: 0; padding-left: 20px; font-size: 0.9em; color: #666; }
+
 .table-wrapper { width: 100%; overflow-x: auto; margin-top: 20px; }
 .table-container { min-width: 800px; }
 table { width: 100%; border-collapse: collapse; }

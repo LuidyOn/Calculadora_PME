@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <div class="simulator-container">
+    <div id="capture" class="simulator-container">
         <header>
             <div class="logo">
                 <span class="logo-main">Simulador de Financiamento</span>
@@ -59,7 +59,7 @@
                     </div>
                     <div class="form-group read-only">
                         <label>VALOR FINANCIADO:</label>
-                        <span id="valorFinanciado">100.000,00</span>
+                        <span id="valorFinanciado"></span>
                     </div>
                     <div class="form-group read-only">
                         <label>IOF:</label>
@@ -88,9 +88,9 @@
                         <label>CET (A.A.%):</label>
                         <span id="cetAA">5,00%</span>
                     </div>
-                     <div class="form-group read-only">
+                    <div class="form-group read-only">
                         <label>PARCELAS DE PRINCIPAL:</label>
-                        <span id="parcelasPrincipal">7</span>
+                        <span id="parcelasPrincipal"></span>
                     </div>
                 </div>
             </div>
@@ -119,6 +119,10 @@
             </ul>
         </div>
 
+        <div class="actions">
+            <button id="btn-gerar-pdf">Gerar PDF</button>
+        </div>
+
         <div class="table-wrapper">
             <div class="table-container">
                 <table>
@@ -134,10 +138,10 @@
                         </tr>
                     </thead>
                     <tbody id="amortization-body">
-                    </tbody>
-                    <tfoot>
+                        </tbody>
+                    <tfoot id="amortization-foot">
                         <tr>
-                            <td colspan="4"><strong>TOTAL À DIREITA <span style="font-size:1.5em;">&#8594;</span></strong></td>
+                            <td colspan="4"><strong>TOTAL À DIREITA </strong></td>
                             <td id="total-juros"></td>
                             <td id="total-principal"></td>
                             <td id="total-geral"></td>
@@ -147,6 +151,9 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script src="./script/script.js"></script>
 </body>
