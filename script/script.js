@@ -88,30 +88,70 @@ document.addEventListener('DOMContentLoaded', () => {
     // Executa as funções iniciais assim que a página carrega
     setInitialDate();
     formatarValor(valorBemInput);
-    calcularTudo(); // ESTA É A CHAMADA QUE POPULA A TABELA INICIALMENTE
+    calcularTudo();
 
-    // Lógica para Gerar PDF
+    // LÓGICA ATUALIZADA PARA GERAR PDF
     const btnGerarPdf = document.getElementById('btn-gerar-pdf');
-    btnGerarPdf.addEventListener('click', () => {
+    btnGerarPdf.addEventListener('click', async () => {
         const elementToCapture = document.getElementById('capture');
         const originalButtonText = btnGerarPdf.textContent;
+
         btnGerarPdf.textContent = 'Gerando...';
         btnGerarPdf.disabled = true;
         btnGerarPdf.style.display = 'none';
-        html2canvas(elementToCapture, { scale: 2, useCORS: true })
-            .then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save('simulacao_financiamento.pdf');
-            })
-            .finally(() => {
-                btnGerarPdf.textContent = originalButtonText;
-                btnGerarPdf.disabled = false;
-                btnGerarPdf.style.display = 'block';
+
+        const originalBodyOverflow = document.body.style.overflow;
+        const originalBodyHeight = document.body.style.height;
+        const originalElementToCaptureHeight = elementToCapture.style.height;
+
+        document.body.style.overflow = 'visible';
+        document.body.style.height = 'auto';
+        elementToCapture.style.height = 'auto';
+        
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        try {
+            if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+                console.error("jsPDF não está carregado ou acessível.");
+                alert("Erro ao carregar a funcionalidade de PDF.");
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+
+            const canvas = await html2canvas(elementToCapture, {
+                scale: 2, useCORS: true, logging: true, scrollY: -window.scrollY
             });
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            let pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            let heightLeft = pdfHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+            heightLeft -= pdf.internal.pageSize.getHeight();
+
+            while (heightLeft > 0) {
+                position = heightLeft - pdfHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pdf.internal.pageSize.getHeight();
+            }
+            
+            pdf.save('simulacao_financiamento.pdf');
+
+        } catch (error) {
+            console.error("Erro ao gerar PDF:", error);
+            alert("Ocorreu um erro ao gerar o PDF. No Brave, verifique se os 'Shields' estão desativados.");
+        } finally {
+            btnGerarPdf.textContent = originalButtonText;
+            btnGerarPdf.disabled = false;
+            btnGerarPdf.style.display = 'block';
+
+            document.body.style.overflow = originalBodyOverflow;
+            document.body.style.height = originalBodyHeight;
+            elementToCapture.style.height = originalElementToCaptureHeight;
+        }
     });
 });
