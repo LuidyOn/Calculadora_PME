@@ -11,22 +11,32 @@
     <div class="simulator-container">
         <header>
             <div class="logo">
-                <span class="logo-main">CNH INDUSTRIAL</span>
-                <span class="logo-sub">CAPITAL</span>
+                <span class="logo-main">Simulador de Financiamento</span>
+                <span class="logo-sub">PME</span>
             </div>
-            <h1>SIMULADOR PRONAF *</h1>
+            <div class="calculator-selector">
+                <span id="current-calculator">Simulador AG: Pronaf</span> &#9662;
+                <div class="calculator-dropdown">
+                    <a href="#">Simulador AG: Pronaf</a>
+                    <a href="#">(Outra Calculadora)</a>
+                    <a href="#">(Mais uma opção)</a>
+                </div>
+            </div>
         </header>
 
         <form id="loan-form">
             <div class="form-grid">
                 <div class="form-column">
                     <div class="form-group">
-                        <label for="tipoFinanciamento">TIPO DE FINANCIAMENTO:</label>
-                        <input type="text" id="tipoFinanciamento" value="PJ">
+                        <label for="tipoPessoa">TIPO PESSOA:</label>
+                        <select id="tipoPessoa">
+                            <option value="PF" selected>PF</option>
+                            <option value="PJ">PJ</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="liberacao">LIBERAÇÃO:</label>
-                        <input type="date" id="liberacao" value="2025-07-15">
+                        <input type="date" id="liberacao">
                     </div>
                     <div class="form-group">
                         <label for="produto">PRODUTO:</label>
@@ -34,16 +44,18 @@
                     </div>
                      <div class="form-group">
                         <label for="empresa">EMPRESA:</label>
-                        <input type="text" id="empresa" value="GDE">
+                        <select id="empresa">
+                            <option value="MPME" selected>MPME</option>
+                            <option value="GDE">GDE</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="valorBem">VALOR DO BEM:</label>
-                        <input type="number" id="valorBem" value="100000.00" step="1000">
+                        <input type="text" id="valorBem" value="100.000,00" inputmode="numeric">
                     </div>
                     <div class="form-group">
-                        <label for="percFinanciado">% FINANCIADO:</label>
-                        <input type="number" id="percFinanciado" value="100">
-                        <span class="status-ok">OK</span>
+                        <label for="percEntrada">% DE ENTRADA:</label>
+                        <input type="number" id="percEntrada" value="0">
                     </div>
                     <div class="form-group read-only">
                         <label>VALOR FINANCIADO:</label>
@@ -76,11 +88,7 @@
                         <label>CET (A.A.%):</label>
                         <span id="cetAA">5,00%</span>
                     </div>
-                    <div class="form-group read-only">
-                        <label>PRESTAÇÃO (1ª):</label>
-                        <span id="prestacao">18.433,03</span>
-                    </div>
-                    <div class="form-group read-only">
+                     <div class="form-group read-only">
                         <label>PARCELAS DE PRINCIPAL:</label>
                         <span id="parcelasPrincipal">7</span>
                     </div>
@@ -95,7 +103,8 @@
                 <div class="form-group-inline">
                     <label>CARÊNCIA (EM MESES)</label>
                     <span>Até 14 meses</span>
-                    <input type="number" id="carencia" value="10" readonly> </div>
+                    <input type="number" id="carencia" value="10" readonly>
+                </div>
             </div>
         </form>
 
@@ -104,7 +113,7 @@
             <ul>
                 <li>O fluxo apresenta valores aproximados, que poderão variar de acordo com cada operação e o período de carência pactuado.</li>
                 <li>Os valores apresentados não são vinculativos.</li>
-                <li>Simulação sujeita a aprovação de crédito conforme política do Banco CNHI Capital.</li>
+                <li>Simulação sujeita a aprovação de crédito conforme política do agente financeiro.</li>
                 <li>Os campos em cinza devem ser preenchidos para completa exibição do fluxo.</li>
                 <li>As condições comerciais disponíveis informadas nesta proposta estão sujeitas a alteração a qualquer momento e sem aviso prévio.</li>
             </ul>
@@ -128,7 +137,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="4"><strong>TOTAL À DIREITA &rarr;</strong></td>
+                            <td colspan="4"><strong>TOTAL À DIREITA <span style="font-size:1.5em;">&#8594;</span></strong></td>
                             <td id="total-juros"></td>
                             <td id="total-principal"></td>
                             <td id="total-geral"></td>
