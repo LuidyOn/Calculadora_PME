@@ -1,21 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- NOVO: PREENCHER DATA DE LIBERAÇÃO AUTOMATICAMENTE ---
+    // --- PREENCHER DATA DE LIBERAÇÃO AUTOMATICAMENTE ---
     function setInitialDate() {
         const liberacaoInput = document.getElementById('liberacao');
         const today = new Date();
         
-        // Formata a data para o padrão YYYY-MM-DD exigido pelo input type="date"
         const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0'); // Meses são de 0-11, então +1
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
         
         const formattedToday = `${yyyy}-${mm}-${dd}`;
         
-        // Define o valor do campo
         liberacaoInput.value = formattedToday;
     }
-    // --- FIM DO BLOCO NOVO ---
-
 
     // --- LÓGICA DE DIAS ÚTEIS ---
     const feriadosNacionais = [
@@ -43,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return dataAjustada;
     }
     
-    // --- FIM DA LÓGICA DE DIAS ÚTEIS ---
+    // --- FIM DA LÓGICA ---
 
     const inputs = document.querySelectorAll('#valorBem, #percFinanciado, #parcelas, #taxaAA, #liberacao, #primeiroVencimento, #periodicidade');
 
@@ -97,9 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 dataVencimentoCalculada = new Date(dataPrimeiroVencimento);
             } else {
                 dataVencimentoCalculada = new Date(dataVencimentoAnterior);
+                
+                // --- ALTERAÇÃO PRINCIPAL AQUI ---
                 if (periodicidade === 'ANUAL') {
                     dataVencimentoCalculada.setFullYear(dataVencimentoAnterior.getFullYear() + 1);
-                } else {
+                } else if (periodicidade === 'SEMESTRAL') { // Lógica para semestral
+                    dataVencimentoCalculada.setMonth(dataVencimentoAnterior.getMonth() + 6);
+                } else { // MENSAL
                     dataVencimentoCalculada.setMonth(dataVencimentoAnterior.getMonth() + 1);
                 }
             }
@@ -138,6 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Executa as funções iniciais no carregamento da página
-    setInitialDate(); // Define a data de hoje no campo de liberação
-    calcularTudo(); // Roda o cálculo inicial com os valores padrão
+    setInitialDate();
+    calcularTudo();
 });
