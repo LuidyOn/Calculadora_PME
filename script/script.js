@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formatarValor(valorBemInput);
     calcularTudo();
 
-    // LÓGICA ATUALIZADA PARA GERAR PDF
+    // LÓGICA CORRIGIDA PARA GERAR PDF
     const btnGerarPdf = document.getElementById('btn-gerar-pdf');
     btnGerarPdf.addEventListener('click', async () => {
         const elementToCapture = document.getElementById('capture');
@@ -103,16 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
         btnGerarPdf.disabled = true;
         btnGerarPdf.style.display = 'none';
 
-        // <<< SOLUÇÃO AQUI: Bloco para lidar com a ROLAGEM HORIZONTAL da tabela
+        // Bloco para lidar com a rolagem horizontal
         const tableWrapper = document.querySelector('.table-wrapper');
         const tableContainer = document.querySelector('.table-container');
         const originalWrapperOverflow = tableWrapper.style.overflowX;
         const originalContainerMinWidth = tableContainer.style.minWidth;
-        tableWrapper.style.overflowX = 'visible'; // Permite que a tabela transborde
-        tableContainer.style.minWidth = 'auto';   // Remove a largura mínima que causa a rolagem
-        // Fim do bloco da solução
+        tableWrapper.style.overflowX = 'visible';
+        tableContainer.style.minWidth = 'auto';
 
-        // Bloco para lidar com a ROLAGEM VERTICAL da página
+        // Bloco para lidar com a rolagem vertical
         const originalBodyOverflow = document.body.style.overflow;
         const originalBodyHeight = document.body.style.height;
         document.body.style.overflow = 'visible';
@@ -121,32 +120,40 @@ document.addEventListener('DOMContentLoaded', () => {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         try {
+            // Verifica se a biblioteca PDF está carregada
             if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
                 console.error("jsPDF não está carregado ou acessível.");
                 alert("Erro ao carregar a funcionalidade de PDF.");
                 return;
             }
+
+            // <<< CORREÇÃO AQUI: A variável é declarada APENAS UMA VEZ
             const { jsPDF } = window.jspdf;
 
             const canvas = await html2canvas(elementToCapture, {
                 scale: 2, useCORS: true, logging: false, scrollY: -window.scrollY
             });
 
+            // A partir daqui, começa a lógica do PADDING que conversamos
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            let pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-            let heightLeft = pdfHeight;
+
+            const margin = 10;
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = pageWidth - (margin * 2);
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
             let position = 0;
 
-            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-            heightLeft -= pdf.internal.pageSize.getHeight();
+            pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - (margin * 2));
 
             while (heightLeft > 0) {
-                position = heightLeft - pdfHeight;
+                position -= (pageHeight - margin);
                 pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-                heightLeft -= pdf.internal.pageSize.getHeight();
+                pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+                heightLeft -= (pageHeight - (margin * 2));
             }
             
             pdf.save('simulacao_financiamento.pdf');
@@ -159,10 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
             btnGerarPdf.disabled = false;
             btnGerarPdf.style.display = 'block';
 
-            // <<< SOLUÇÃO AQUI: Restaura os estilos da ROLAGEM HORIZONTAL da tabela
+            // Restaura estilos da tabela para o layout mobile
             tableWrapper.style.overflowX = originalWrapperOverflow;
             tableContainer.style.minWidth = originalContainerMinWidth;
-            // Fim do bloco da solução
 
             // Restaura estilos de rolagem vertical
             document.body.style.overflow = originalBodyOverflow;
