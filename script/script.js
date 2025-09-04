@@ -38,7 +38,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return dataAjustada;
     }
-    
+
+    // --- NOVO: LÓGICA DE CÁLCULO E VALIDAÇÃO DA CARÊNCIA ---
+    function atualizarCarenciaEValidar() {
+        const liberacaoInput = document.getElementById('liberacao');
+        const vencimentoInput = document.getElementById('primeiroVencimento');
+        const carenciaInput = document.getElementById('carencia');
+        
+        const dataLiberacao = new Date(liberacaoInput.value + 'T00:00:00');
+        const dataPrimeiroVencimento = new Date(vencimentoInput.value + 'T00:00:00');
+
+        if (isNaN(dataLiberacao.getTime()) || isNaN(dataPrimeiroVencimento.getTime())) {
+            carenciaInput.value = 0;
+            return;
+        }
+
+        // Calcula a diferença em meses
+        const mesesDiferenca = (dataPrimeiroVencimento.getFullYear() - dataLiberacao.getFullYear()) * 12 + 
+                                (dataPrimeiroVencimento.getMonth() - dataLiberacao.getMonth());
+        
+        carenciaInput.value = mesesDiferenca;
+
+        // Validação: verifica se a carência ultrapassa 14 meses
+        if (mesesDiferenca > 14) {
+            alert("A carência não pode exceder 14 meses. A data do primeiro vencimento será ajustada para o limite máximo permitido.");
+
+            // Calcula a data máxima permitida (Liberação + 14 meses)
+            let dataMaxima = new Date(dataLiberacao);
+            dataMaxima.setMonth(dataMaxima.getMonth() + 14);
+
+            // Formata e reverte a data no input
+            const yyyy = dataMaxima.getFullYear();
+            const mm = String(dataMaxima.getMonth() + 1).padStart(2, '0');
+            const dd = String(dataMaxima.getDate()).padStart(2, '0');
+            vencimentoInput.value = `${yyyy}-${mm}-${dd}`;
+            
+            // Atualiza o valor da carência para o máximo
+            carenciaInput.value = 14;
+
+            // Dispara um novo evento de 'input' para que o cálculo geral seja refeito com a data corrigida
+            vencimentoInput.dispatchEvent(new Event('input')); 
+        }
+    }
+
     // --- FIM DA LÓGICA ---
 
     const inputs = document.querySelectorAll('#valorBem, #percFinanciado, #parcelas, #taxaAA, #liberacao, #primeiroVencimento, #periodicidade');
@@ -47,16 +89,16 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('input', calcularTudo);
     });
 
-    const formatCurrency = (value) => {
-        return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    };
-    
-    const formatDate = (date) => {
-        if (isNaN(date.getTime())) return 'Data inválida';
-        return date.toLocaleDateString('pt-BR');
-    };
+    const formatCurrency = (value) => value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formatDate = (date) => isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
 
-    function calcularTudo() {
+    function calcularTudo(event) {
+        // Evita loop infinito na validação da carência
+        if (event && event.isTrusted === false) return; 
+
+        // Roda a validação da carência primeiro
+        atualizarCarenciaEValidar();
+
         const valorBem = parseFloat(document.getElementById('valorBem').value) || 0;
         const percFinanciado = parseFloat(document.getElementById('percFinanciado').value) || 0;
         const numParcelas = parseInt(document.getElementById('parcelas').value) || 1;
@@ -93,11 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 dataVencimentoCalculada = new Date(dataPrimeiroVencimento);
             } else {
                 dataVencimentoCalculada = new Date(dataVencimentoAnterior);
-                
-                // --- ALTERAÇÃO PRINCIPAL AQUI ---
                 if (periodicidade === 'ANUAL') {
                     dataVencimentoCalculada.setFullYear(dataVencimentoAnterior.getFullYear() + 1);
-                } else if (periodicidade === 'SEMESTRAL') { // Lógica para semestral
+                } else if (periodicidade === 'SEMESTRAL') {
                     dataVencimentoCalculada.setMonth(dataVencimentoAnterior.getMonth() + 6);
                 } else { // MENSAL
                     dataVencimentoCalculada.setMonth(dataVencimentoAnterior.getMonth() + 1);
@@ -114,15 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             totalJuros += juros;
 
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${i}</td>
-                <td>${formatDate(dataVencimentoAtual)}</td>
-                <td>${diasCorridos}</td>
-                <td>${formatCurrency(saldoDevedor)}</td>
-                <td>${formatCurrency(juros)}</td>
-                <td>${formatCurrency(principalPorParcela)}</td>
-                <td>${formatCurrency(totalParcela)}</td>
-            `;
+            row.innerHTML = `<td>${i}</td><td>${formatDate(dataVencimentoAtual)}</td><td>${diasCorridos}</td><td>${formatCurrency(saldoDevedor)}</td><td>${formatCurrency(juros)}</td><td>${formatCurrency(principalPorParcela)}</td><td>${formatCurrency(totalParcela)}</td>`;
             tbody.appendChild(row);
 
             saldoDevedor -= principalPorParcela;
