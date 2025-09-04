@@ -29,12 +29,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const liberacaoInput = document.getElementById('liberacao'); const vencimentoInput = document.getElementById('primeiroVencimento'); const carenciaInput = document.getElementById('carencia'); const dataLiberacao = new Date(liberacaoInput.value + 'T00:00:00'); const dataPrimeiroVencimento = new Date(vencimentoInput.value + 'T00:00:00'); if (isNaN(dataLiberacao.getTime()) || isNaN(dataPrimeiroVencimento.getTime())) { carenciaInput.value = 0; return; } const mesesDiferenca = (dataPrimeiroVencimento.getFullYear() - dataLiberacao.getFullYear()) * 12 + (dataPrimeiroVencimento.getMonth() - dataLiberacao.getMonth()); carenciaInput.value = mesesDiferenca; if (mesesDiferenca > 14) { alert("A carência não pode exceder 14 meses. A data do primeiro vencimento será ajustada."); let dataMaxima = new Date(dataLiberacao); dataMaxima.setMonth(dataMaxima.getMonth() + 14); const yyyy = dataMaxima.getFullYear(); const mm = String(dataMaxima.getMonth() + 1).padStart(2, '0'); const dd = String(dataMaxima.getDate()).padStart(2, '0'); vencimentoInput.value = `${yyyy}-${mm}-${dd}`; carenciaInput.value = 14; vencimentoInput.dispatchEvent(new Event('input')); }
     }
 
+    // Adiciona "ouvintes" a todos os campos que devem recalcular o simulador
     const inputs = document.querySelectorAll('#valorBem, #percEntrada, #parcelas, #taxaAA, #liberacao, #primeiroVencimento, #periodicidade');
     inputs.forEach(input => input.addEventListener('input', calcularTudo));
 
+    // Funções de formatação
     const formatCurrency = (value) => value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const formatDate = (date) => isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
 
+    // Função principal que faz todos os cálculos
     function calcularTudo(event) {
         if (event && event.isTrusted === false) return;
         atualizarCarenciaEValidar();
@@ -100,13 +103,20 @@ document.addEventListener('DOMContentLoaded', () => {
         btnGerarPdf.disabled = true;
         btnGerarPdf.style.display = 'none';
 
+        // <<< SOLUÇÃO AQUI: Bloco para lidar com a ROLAGEM HORIZONTAL da tabela
+        const tableWrapper = document.querySelector('.table-wrapper');
+        const tableContainer = document.querySelector('.table-container');
+        const originalWrapperOverflow = tableWrapper.style.overflowX;
+        const originalContainerMinWidth = tableContainer.style.minWidth;
+        tableWrapper.style.overflowX = 'visible'; // Permite que a tabela transborde
+        tableContainer.style.minWidth = 'auto';   // Remove a largura mínima que causa a rolagem
+        // Fim do bloco da solução
+
+        // Bloco para lidar com a ROLAGEM VERTICAL da página
         const originalBodyOverflow = document.body.style.overflow;
         const originalBodyHeight = document.body.style.height;
-        const originalElementToCaptureHeight = elementToCapture.style.height;
-
         document.body.style.overflow = 'visible';
         document.body.style.height = 'auto';
-        elementToCapture.style.height = 'auto';
         
         await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -119,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { jsPDF } = window.jspdf;
 
             const canvas = await html2canvas(elementToCapture, {
-                scale: 2, useCORS: true, logging: true, scrollY: -window.scrollY
+                scale: 2, useCORS: true, logging: false, scrollY: -window.scrollY
             });
 
             const imgData = canvas.toDataURL('image/png');
@@ -149,9 +159,14 @@ document.addEventListener('DOMContentLoaded', () => {
             btnGerarPdf.disabled = false;
             btnGerarPdf.style.display = 'block';
 
+            // <<< SOLUÇÃO AQUI: Restaura os estilos da ROLAGEM HORIZONTAL da tabela
+            tableWrapper.style.overflowX = originalWrapperOverflow;
+            tableContainer.style.minWidth = originalContainerMinWidth;
+            // Fim do bloco da solução
+
+            // Restaura estilos de rolagem vertical
             document.body.style.overflow = originalBodyOverflow;
             document.body.style.height = originalBodyHeight;
-            elementToCapture.style.height = originalElementToCaptureHeight;
         }
     });
 });
