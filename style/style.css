@@ -93,4 +93,39 @@ th:nth-child(n+3), td:nth-child(n+3) { text-align: right; }
     .form-grid { grid-template-columns: 1fr 1fr; }
     .form-row { flex-direction: row; justify-content: space-between; align-items: flex-end; }
     .form-group-inline { margin-top: 0; }
+
+    /* --- NOVO: Estilos para a Página Inicial (index.html) --- */
+.landing-page {
+    padding: 20px 10px;
+    text-align: center;
+}
+.landing-page h1 {
+    color: var(--dark-blue);
+    margin-bottom: 20px;
+}
+.landing-page p {
+    font-size: 1.1em;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+.landing-page .instructions {
+    text-align: left;
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: var(--light-gray);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 5px solid var(--primary-blue);
+}
+.landing-page .instructions h2 {
+    margin-top: 0;
+}
+.landing-page .instructions ol {
+    padding-left: 20px;
+}
+.landing-page .instructions li {
+    margin-bottom: 10px;
+}
+
 }

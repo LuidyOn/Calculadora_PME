@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Moderfrota</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <div id="capture" class="simulator-container">
+        <header>
+            <div class="logo">
+                <span class="logo-main">Simulador de Financiamento</span>
+                <span class="logo-sub">PME</span>
+            </div>
+            <div class="calculator-selector">
+                <span id="current-calculator">Simulador Moderfrota</span> &#9662;
+                <div class="calculator-dropdown">
+                    <a href="../index.html">Página Inicial</a>
+                    <a href="pronaf.html">Simulador AG: Pronaf</a>
+                    <a href="moderfrota.html">Simulador Moderfrota</a>
+                </div>
+            </div>
+        </header>
+
+        <form id="loan-form">
+            <div class="form-grid">
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="tipoFinanciamento">TIPO DE FINANCIAMENTO:</label>
+                        <select id="tipoFinanciamento">
+                            <option value="PF" selected>PF</option>
+                            <option value="PJ">PJ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="liberacao">LIBERAÇÃO:</label>
+                        <input type="date" id="liberacao">
+                    </div>
+                    <div class="form-group">
+                        <label for="produto">PRODUTO:</label>
+                        <select id="produto">
+                            <option value="MODERFROTA NOVOS" selected>MODERFROTA NOVOS</option>
+                            <option value="MODERFROTA USADOS">MODERFROTA USADOS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="empresa">EMPRESA:</label>
+                        <select id="empresa">
+                            <option value="MPME" selected>MPME</option>
+                            <option value="GDE">GDE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="valorBem">VALOR DO BEM:</label>
+                        <input type="text" id="valorBem" value="1.000.000,00" inputmode="numeric">
+                    </div>
+                    <div class="form-group">
+                        <label for="percEntrada">ENTRADA:</label>
+                        <input type="number" id="percEntrada" value="20">
+                    </div>
+                    <div class="form-group read-only">
+                        <label>VALOR FINANCIADO:</label>
+                        <span id="valorFinanciado"></span>
+                    </div>
+                </div>
+                <div class="form-column">
+                    <div class="form-group read-only">
+                        <label>SEGMENTO DO CLIENTE:</label>
+                        <span id="segmentoCliente">RURAL</span>
+                    </div>
+                    <div class="form-group read-only">
+                        <label>SEGMENTO:</label>
+                        <span id="segmento">AG</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="periodicidade">PERIODICIDADE:</label>
+                        <select id="periodicidade">
+                            <option value="ANUAL" selected>ANUAL</option>
+                            <option value="SEMESTRAL">SEMESTRAL</option>
+                            <option value="MENSAL">MENSAL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="parcelas">PARCELAS:</label>
+                        <input type="number" id="parcelas" value="7">
+                    </div>
+                    <div class="form-group read-only">
+                        <label>PARCELAS DE PRINCIPAL:</label>
+                        <span id="parcelasPrincipal"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="taxaAA">TAXA (A.A%):</label>
+                        <input type="number" id="taxaAA" value="13.50" step="0.1">
+                    </div>
+                    <div class="form-group read-only">
+                        <label>CET (A.A.%):</label>
+                        <span id="cetAA"></span>
+                    </div>
+                    <div class="form-group read-only">
+                        <label>CET (A.M.%):</label>
+                        <span id="cetAM"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="primeiroVencimento">PRIMEIRO VENCIMENTO:</label>
+                    <input type="date" id="primeiroVencimento">
+                </div>
+                <div class="form-group-inline">
+                    <label>CARÊNCIA (EM MESES)</label>
+                    <input type="number" id="carencia" readonly>
+                </div>
+            </div>
+        </form>
+        <div class="actions">
+            <button id="btn-gerar-pdf">Gerar PDF</button>
+        </div>
+        <div class="observations">
+            <p><strong>**OBSERVAÇÕES**</strong></p>
+            <ul>
+                <li>O fluxo apresenta valores aproximados, que poderão variar de acordo com cada operação e o período de carência pactuado.</li>
+                <li>Os valores apresentados não são vinculativos.</li>
+                <li>Simulação sujeita a aprovação de crédito conforme política do agente financeiro.</li>
+                <li>Os campos em cinza devem ser preenchidos para completa exibição do fluxo.</li>
+                <li>As condições comerciais disponíveis informadas nesta proposta estão sujeitas a alteração a qualquer momento e sem aviso prévio.</li>
+            </ul>
+        </div>
+        <div class="table-wrapper">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PARCELA</th>
+                            <th>VENCIMENTO</th>
+                            <th>DIAS</th>
+                            <th>SALDO DEVEDOR</th>
+                            <th>JUROS</th>
+                            <th>PRINCIPAL</th>
+                            <th>TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortization-body"></tbody>
+                    <tfoot id="amortization-foot">
+                        <tr>
+                            <td colspan="4"><strong>TOTAL À DIREITA <span style="font-size: 1.5em;">&#8594;</span></strong></td>
+                            <td id="total-juros"></td>
+                            <td id="total-principal"></td>
+                            <td id="total-geral"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../script/moderfrota.js"></script>
+</body>
+</html>
