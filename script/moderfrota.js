@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 scale: 2, useCORS: true, logging: false, scrollY: -window.scrollY
             });
 
-            // A partir daqui, começa a lógica do PADDING que conversamos
+            // A partir daqui, começa a lógica do PADDING
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
 
@@ -192,6 +192,28 @@ document.addEventListener('DOMContentLoaded', () => {
             // Restaura estilos de rolagem vertical
             document.body.style.overflow = originalBodyOverflow;
             document.body.style.height = originalBodyHeight;
+        }
+        // --- NOVO: LÓGICA PARA O MENU DROPDOWN FUNCIONAR EM TODOS OS DISPOSITIVOS ---
+    });
+        const calculatorSelector = document.querySelector('.calculator-selector');
+    const calculatorDropdown = document.querySelector('.calculator-dropdown');
+
+    if (calculatorSelector) {
+    calculatorSelector.addEventListener('click', (event) => {
+        // Impede que o clique no botão feche o menu imediatamente (ver listener do window)
+        event.stopPropagation(); 
+        // Adiciona ou remove a classe 'show' para exibir/ocultar o menu
+        calculatorDropdown.classList.toggle('show');
+    });
+    }
+
+    // Opcional, mas recomendado: Fecha o menu se o usuário clicar fora dele
+    window.addEventListener('click', (event) => {
+        if (calculatorDropdown && calculatorDropdown.classList.contains('show')) {
+            // Se o clique não foi dentro do seletor, fecha o menu
+            if (!calculatorSelector.contains(event.target)) {
+                calculatorDropdown.classList.remove('show');
+            }
         }
     });
 });

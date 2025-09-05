@@ -35,7 +35,9 @@ header {
 }
 .calculator-dropdown a { display: block; padding: 10px 15px; color: var(--dark-blue); text-decoration: none; font-size: 0.9em; }
 .calculator-dropdown a:hover { background-color: var(--light-gray); }
-.calculator-selector:hover .calculator-dropdown { display: block; }
+.calculator-dropdown.show {
+    display: block;
+}
 
 /* --- FORMULÁRIO --- */
 .form-grid { display: grid; grid-template-columns: 1fr; gap: 0 40px; }
