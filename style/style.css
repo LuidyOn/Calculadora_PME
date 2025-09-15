@@ -275,6 +275,12 @@ th:nth-child(n+3), td:nth-child(n+3) {
     padding-bottom: 5px;
     margin-bottom: 8px;
 }
+
+/* --- NOVO: Força o layout de duas colunas no PDF, independente do tamanho da tela --- */
+.pdf-compact-mode .form-grid {
+    grid-template-columns: 1fr 1fr !important;
+}
+
 .pdf-compact-mode .logo-main {
     font-size: 14px;
 }
@@ -333,10 +339,10 @@ th:nth-child(n+3), td:nth-child(n+3) {
 .pdf-compact-mode table th,
 .pdf-compact-mode table td {
     padding: 3px 5px; /* Diminui drasticamente o padding das células */
-    font-size: 12px;   /* Diminui a fonte dentro da tabela */
+    font-size: 14px;   /* Diminui a fonte dentro da tabela */
 }
 .pdf-compact-mode tfoot td {
-    font-size: 13px; /* Deixa a fonte do total um pouco maior */
+    font-size: 17px; /* Deixa a fonte do total um pouco maior */
 }
 
 
