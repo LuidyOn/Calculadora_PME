@@ -8,93 +8,227 @@
     --border-color: #ccc;
 }
 body {
-    font-family: Arial, sans-serif; background-color: #e9ecef; color: var(--text-color);
-    margin: 0; padding: 10px; font-size: 14px;
+    font-family: Arial, sans-serif;
+    background-color: #e9ecef; 
+    color: var(--text-color);
+    margin: 0;
+    padding: 10px; font-size: 14px;
 }
 .simulator-container {
-    max-width: 900px; margin: 0 auto; background-color: #fff;
-    padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-width: 900px; 
+    margin: 0 auto; 
+    background-color: #fff;
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 /* --- CABEÇALHO --- */
 header {
-    display: flex; flex-direction: column; align-items: center; border-bottom: 2px solid var(--light-gray);
-    padding-bottom: 15px; margin-bottom: 20px; text-align: center;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    border-bottom: 2px solid var(--light-gray);
+    padding-bottom: 15px;
+    margin-bottom: 20px; 
+    text-align: center;
 }
-.logo { display: flex; flex-direction: column; margin-bottom: 10px; }
-.logo-main { color: var(--primary-blue); font-weight: bold; font-size: 20px; }
-.logo-sub { color: var(--accent-yellow); font-weight: bold; font-size: 16px; }
+.logo { 
+    display: flex; 
+    flex-direction: column; 
+    margin-bottom: 10px; }
+.logo-main { 
+    color: var(--primary-blue); 
+    font-weight: bold; font-size: 20px; }
+.logo-sub { 
+    color: var(--accent-yellow); 
+    font-weight: bold; 
+    font-size: 16px; }
 .calculator-selector {
-    position: relative; width: 100%; background-color: var(--primary-blue); color: white;
-    padding: 10px; margin: 0; font-size: 1.2em; font-weight: bold;
-    border-radius: 5px; cursor: pointer; box-sizing: border-box;
+    position: relative; 
+    width: 100%; 
+    background-color: var(--primary-blue); 
+    color: white;
+    padding: 10px; 
+    margin: 0; 
+    font-size: 1.2em; 
+    font-weight: bold;
+    border-radius: 5px; 
+    cursor: pointer; 
+    box-sizing: border-box;
 }
 .calculator-dropdown {
-    display: none; position: absolute; top: 100%; left: 0; right: 0; background-color: #fff;
-    border: 1px solid var(--border-color); border-radius: 0 0 5px 5px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 10;
+    display: none; 
+    position: absolute; 
+    top: 100%; 
+    left: 0; 
+    right: 0; background-color: #fff;
+    border: 1px solid var(--border-color); 
+    border-radius: 0 0 5px 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+    z-index: 10;
 }
-.calculator-dropdown a { display: block; padding: 10px 15px; color: var(--dark-blue); text-decoration: none; font-size: 0.9em; }
-.calculator-dropdown a:hover { background-color: var(--light-gray); }
+.calculator-dropdown a { display: block; 
+    padding: 10px 15px; 
+    color: var(--dark-blue); 
+    text-decoration: none; 
+    font-size: 0.9em; }
+.calculator-dropdown a:hover { 
+    background-color: var(--light-gray); 
+}
 .calculator-dropdown.show {
     display: block;
 }
 
 /* --- FORMULÁRIO --- */
-.form-grid { display: grid; grid-template-columns: 1fr; gap: 0 40px; }
-.form-group { display: flex; flex-direction: column; margin-bottom: 12px; }
-.form-group label { font-weight: bold; margin-bottom: 5px; color: #555; }
-.form-group input, .form-group span, .form-group select {
-    padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;
-    font-size: 1em; width: 100%; box-sizing: border-box;
+.form-grid { 
+    display: grid; 
+    grid-template-columns: 1fr; 
+    gap: 0 40px; }
+.form-group { 
+    display: flex; 
+    flex-direction: column; 
+    margin-bottom: 12px; }
+.form-group label { 
+    font-weight: bold; 
+    margin-bottom: 5px; 
+    color: #555; 
 }
-.form-group input, .form-group select { background-color: var(--light-gray); }
+.form-group input, .form-group span, .form-group select {
+    padding: 8px; 
+    border: 1px solid var(--border-color); 
+    border-radius: 4px;
+    font-size: 1em; 
+    width: 100%; 
+    box-sizing: border-box;
+}
+.form-group input, .form-group select { 
+    background-color: var(--light-gray); 
+}
 .form-group input[type="text"], .form-group input[type="number"] { text-align: right; }
 .form-group.read-only span {
-    background-color: transparent; border: none; padding-left: 0; padding-right: 8px;
-    font-weight: bold; text-align: right;
+    background-color: transparent; 
+    border: none; 
+    padding-left: 0; 
+    padding-right: 8px;
+    font-weight: bold; 
+    text-align: right;
 }
 .form-row {
-    display: flex; flex-direction: column; margin-top: 20px;
-    padding-top: 10px; border-top: 1px solid var(--light-gray);
+    display: flex; 
+    flex-direction: column; 
+    margin-top: 20px;
+    padding-top: 10px; 
+    border-top: 1px solid var(--light-gray);
 }
 .form-group-inline {
-    display: flex; align-items: center; gap: 10px; background-color: var(--light-gray);
-    padding: 8px; border-radius: 4px; margin-top: 10px;
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    background-color: var(--light-gray);
+    padding: 8px; 
+    border-radius: 4px; 
+    margin-top: 10px;
 }
 .form-group-inline label { font-weight: bold; }
 .form-group-inline input { width: 60px; }
 
 /* --- AÇÕES, OBSERVAÇÕES E TABELA --- */
-.actions { display: flex; justify-content: flex-end; margin: 20px 0 0 0; }
-#btn-gerar-pdf {
-    background-color: var(--primary-blue); color: white; font-weight: bold; font-size: 1em;
-    border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;
+.actions { display: flex; 
+    justify-content: flex-end; 
+    margin: 20px 0 0 0; 
 }
-#btn-gerar-pdf:hover { background-color: var(--dark-blue); }
-#btn-gerar-pdf:disabled { background-color: #aaa; cursor: not-allowed; }
+#btn-gerar-pdf {
+    background-color: var(--primary-blue); 
+    color: white; 
+    font-weight: bold; 
+    font-size: 1em;
+    border: none; padding: 12px 20px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    transition: background-color 0.3s;
+}
+#btn-gerar-pdf:hover { 
+    background-color: var(--dark-blue); 
+}
+#btn-gerar-pdf:disabled { 
+    background-color: #aaa; 
+    cursor: not-allowed; 
+    }
 
-.observations { border: 1px solid var(--primary-blue); padding: 15px; margin-top: 20px; border-radius: 5px; }
-.observations p { margin: 0 0 10px 0; color: var(--primary-blue); }
-.observations ul { margin: 0; padding-left: 20px; font-size: 0.9em; color: #666; }
+.observations { 
+    border: 1px solid var(--primary-blue); 
+    padding: 15px; 
+    margin-top: 20px; 
+    border-radius: 5px; 
+}
+.observations p { 
+    margin: 0 0 10px 0; 
+    color: var(--primary-blue); 
+}
+.observations ul { 
+    margin: 0; 
+    padding-left: 20px; 
+    font-size: 0.9em; 
+    color: #666; 
+}
 
-.table-wrapper { width: 100%; overflow-x: auto; margin-top: 20px; }
-.table-container { min-width: 800px; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
-thead th { background-color: var(--dark-blue); color: white; }
-tbody tr:nth-child(even) { background-color: var(--light-gray); }
-tfoot { font-weight: bold; }
-th:nth-child(n+3), td:nth-child(n+3) { text-align: right; }
+.table-wrapper { 
+    width: 100%; 
+    overflow-x: auto; 
+    margin-top: 20px; 
+}
+.table-container { 
+    min-width: 800px; 
+}
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+}
+th, td { 
+    padding: 10px; 
+    text-align: left; 
+    border-bottom: 1px solid var(--border-color); 
+    white-space: nowrap; 
+}
+thead th { 
+    background-color: var(--dark-blue); 
+    color: white; 
+}
+tbody tr:nth-child(even) { 
+background-color: var(--light-gray); 
+}
+tfoot { 
+    font-weight: bold; 
+}
+th:nth-child(n+3), td:nth-child(n+3) { 
+    text-align: right; 
+}
 
 /* --- RESPONSIVIDADE (DESKTOP) --- */
 @media (min-width: 768px) {
     body { padding: 20px; }
-    header { flex-direction: row; text-align: left; }
-    .logo { margin-bottom: 0; }
-    .calculator-selector { margin: 0 0 0 20px; font-size: 1.5em; }
-    .form-grid { grid-template-columns: 1fr 1fr; }
-    .form-row { flex-direction: row; justify-content: space-between; align-items: flex-end; }
-    .form-group-inline { margin-top: 0; }
+    header { 
+        flex-direction: row; 
+        text-align: left; 
+    }
+    .logo { 
+        margin-bottom: 0; 
+    }
+    .calculator-selector { 
+        margin: 0 0 0 20px; 
+        font-size: 1.5em; 
+    }
+    .form-grid { 
+        grid-template-columns: 1fr 1fr; 
+    }
+    .form-row { 
+        flex-direction: row; 
+        justify-content: space-between; 
+        align-items: flex-end; 
+    }
+    .form-group-inline { 
+        margin-top: 0; 
+    }
 
     /* --- NOVO: Estilos para a Página Inicial (index.html) --- */
 .landing-page {
@@ -130,4 +264,123 @@ th:nth-child(n+3), td:nth-child(n+3) { text-align: right; }
     margin-bottom: 10px;
 }
 
+}
+
+/* --- Estilos para o modo de PDF compacto (VERSÃO ATUALIZADA) --- */
+
+/* Aplica as regras quando o container principal tiver a classe 'pdf-compact-mode' */
+
+/* -- AJUSTE: Cabeçalho ainda mais compacto -- */
+.pdf-compact-mode header {
+    padding-bottom: 5px;
+    margin-bottom: 8px;
+}
+.pdf-compact-mode .logo-main {
+    font-size: 14px;
+}
+.pdf-compact-mode .logo-sub {
+    font-size: 12px;
+}
+.pdf-compact-mode .calculator-selector {
+    font-size: 0.9em;
+    padding: 5px;
+}
+
+/* -- AJUSTE: Formulário ainda mais compacto -- */
+.pdf-compact-mode .form-group {
+    margin-bottom: 2px; /* Reduz o espaço entre as linhas do formulário */
+}
+.pdf-compact-mode .form-group label {
+    margin-bottom: 1px;
+    font-size: 9px; /* Diminui a fonte dos rótulos */
+}
+.pdf-compact-mode .form-group input,
+.pdf-compact-mode .form-group select,
+.pdf-compact-mode .form-group span {
+    padding: 0 4px;
+    font-size: 10px; /* Diminui a fonte dos valores */
+    height: 20px; /* Diminui a altura da caixa */
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+.pdf-compact-mode .form-group.read-only span {
+    justify-content: flex-end;
+}
+.pdf-compact-mode .form-row {
+    margin-top: 8px; /* Reduz o espaço acima da carência */
+}
+
+/* -- AJUSTE: Observações ainda mais compactas -- */
+.pdf-compact-mode .observations {
+    padding: 6px;
+    margin-top: 8px;
+}
+.pdf-compact-mode .observations p {
+    margin-bottom: 4px;
+    font-size: 9px;
+}
+.pdf-compact-mode .observations ul {
+    font-size: 7px;
+    padding-left: 12px;
+    margin: 0;
+}
+.pdf-compact-mode .observations li {
+    margin-bottom: 2px;
+}
+
+/* -- NOVO: Diminui o espaçamento da tabela -- */
+.pdf-compact-mode table th,
+.pdf-compact-mode table td {
+    padding: 3px 5px; /* Diminui drasticamente o padding das células */
+    font-size: 12px;   /* Diminui a fonte dentro da tabela */
+}
+.pdf-compact-mode tfoot td {
+    font-size: 13px; /* Deixa a fonte do total um pouco maior */
+}
+
+
+/* --- NOVO: Alinhamento das colunas da tabela --- */
+
+/* Alinha os cabeçalhos e células de valores monetários (da 4ª coluna em diante) à direita */
+table th:nth-child(n+4),
+table td:nth-child(n+4) {
+    text-align: right;
+}
+
+/* Alinha a coluna "DIAS" (a 3ª coluna) ao centro para melhor visualização */
+table th:nth-child(3),
+table td:nth-child(3) {
+    text-align: center;
+}
+
+/* Garante que o total na linha de rodapé também esteja à direita */
+tfoot td:nth-last-child(2),
+tfoot td:nth-last-child(3)
+{
+    text-align: right;
+}
+
+
+/* --- NOVO: Força alinhamento à direita para as células numéricas na tabela --- */
+.pdf-compact-mode table td:nth-last-child(2), /* Antepenúltima coluna */
+.pdf-compact-mode table td:nth-last-child(3), /* Terceira de trás para frente */
+.pdf-compact-mode table td:nth-last-child(4), /* Quarta de trás para frente */
+.pdf-compact-mode table td:nth-last-child(5)  /* Quinta de trás para frente */
+{
+    text-align: right; /* Alinha o texto à direita */
+}
+
+/* Garante que o total na linha de rodapé também esteja à direita */
+.pdf-compact-mode tfoot td:nth-last-child(2),
+.pdf-compact-mode tfoot td:nth-last-child(3),
+.pdf-compact-mode tfoot td:nth-last-child(4),
+.pdf-compact-mode tfoot td:nth-last-child(5)
+{
+    text-align: right;
+}
+
+/* Se for preciso alinhar o TOTAL À DIREITA no rodapé */
+.pdf-compact-mode tfoot td:first-child {
+    text-align: left;
 }

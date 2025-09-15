@@ -9,6 +9,17 @@ document.addEventListener('DOMContentLoaded', () => {
         liberacaoInput.value = `${yyyy}-${mm}-${dd}`;
     }
 
+        function setDefaultVencimento() {
+        const vencimentoInput = document.getElementById('primeiroVencimento');
+        const today = new Date();
+        today.setMonth(today.getMonth() + 12);
+        
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        vencimentoInput.value = `${yyyy}-${mm}-${dd}`;
+    }
+
     // Lógica para Máscara de Valor no campo "Valor do Bem"
     const valorBemInput = document.getElementById('valorBem');
     function formatarValor(input) {
@@ -90,92 +101,111 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Executa as funções iniciais assim que a página carrega
     setInitialDate();
+    setDefaultVencimento();
     formatarValor(valorBemInput);
     calcularTudo();
 
-    // LÓGICA CORRIGIDA PARA GERAR PDF
+    // LÓGICA FINAL E UNIFICADA PARA GERAR PDF (CENTRALIZADO COMPACTO E COMPATÍVEL COM IPHONE) (COM CORREÇÃO DO MODO COMPACTO)
     const btnGerarPdf = document.getElementById('btn-gerar-pdf');
     btnGerarPdf.addEventListener('click', async () => {
-        const elementToCapture = document.getElementById('capture');
+        const originalElement = document.getElementById('capture');
         const originalButtonText = btnGerarPdf.textContent;
 
         btnGerarPdf.textContent = 'Gerando...';
         btnGerarPdf.disabled = true;
-        btnGerarPdf.style.display = 'none';
-
-        // Bloco para lidar com a rolagem horizontal
-        const tableWrapper = document.querySelector('.table-wrapper');
-        const tableContainer = document.querySelector('.table-container');
-        const originalWrapperOverflow = tableWrapper.style.overflowX;
-        const originalContainerMinWidth = tableContainer.style.minWidth;
-        tableWrapper.style.overflowX = 'visible';
-        tableContainer.style.minWidth = 'auto';
-
-        // Bloco para lidar com a rolagem vertical
-        const originalBodyOverflow = document.body.style.overflow;
-        const originalBodyHeight = document.body.style.height;
-        document.body.style.overflow = 'visible';
-        document.body.style.height = 'auto';
         
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // PASSO 1: Clonar o elemento que queremos imprimir
+        const clone = originalElement.cloneNode(true);
+
+        // OCULTA O BOTÃO DE GERAR PDF NO CLONE
+        const btnClone = clone.querySelector('#btn-gerar-pdf');
+        if (btnClone) {
+            btnClone.style.display = 'none';
+        }
+
+        // PASSO 2: Criar um container de impressão fora da tela
+        const printContainer = document.createElement('div');
+        printContainer.style.position = 'absolute';
+        printContainer.style.left = '0';
+        printContainer.style.top = '-9999px';
+        printContainer.style.width = '1200px';
+        
+        // <<< MUDANÇA AQUI: Adiciona a classe de modo compacto NO CONTAINER
+        printContainer.classList.add('pdf-compact-mode');
+        
+        // Adiciona o clone ao container e o container ao body
+        printContainer.appendChild(clone);
+        document.body.appendChild(printContainer);
+        
+        // REMOVEMOS a linha que adicionava a classe ao clone.
+        // clone.classList.add('pdf-compact-mode'); // Linha antiga removida
+
+        await new Promise(resolve => setTimeout(resolve, 150));
 
         try {
-            // Verifica se a biblioteca PDF está carregada
             if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
                 console.error("jsPDF não está carregado ou acessível.");
                 alert("Erro ao carregar a funcionalidade de PDF.");
                 return;
             }
-
-            // <<< CORREÇÃO AQUI: A variável é declarada APENAS UMA VEZ
             const { jsPDF } = window.jspdf;
 
-            const canvas = await html2canvas(elementToCapture, {
-                scale: 2, useCORS: true, logging: false, scrollY: -window.scrollY
+            // PASSO 3: Capturar o CLONE, que agora está dentro do container com o modo compacto
+            const canvas = await html2canvas(clone, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
             });
-
-            // A partir daqui, começa a lógica do PADDING que conversamos
-            const imgData = canvas.toDataURL('image/png');
+            
+            // PASSO 4: Recortar o canvas
+            const scale = 2;
+            const contentWidth = clone.offsetWidth * scale;
+            const contentHeight = canvas.height;
+            const destinationCanvas = document.createElement('canvas');
+            destinationCanvas.width = contentWidth;
+            destinationCanvas.height = contentHeight;
+            const ctx = destinationCanvas.getContext('2d');
+            ctx.drawImage(canvas, 0, 0, contentWidth, contentHeight, 0, 0, contentWidth, contentHeight);
+            
+            const imgData = destinationCanvas.toDataURL('image/png');
+            
+            // PASSO 5: Adicionar a imagem recortada e consistente ao PDF
             const pdf = new jsPDF('p', 'mm', 'a4');
-
             const margin = 10;
             const pageWidth = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
             const imgWidth = pageWidth - (margin * 2);
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            const imgHeight = (destinationCanvas.height * imgWidth) / destinationCanvas.width;
+            const xOffset = margin;
+            
             let heightLeft = imgHeight;
             let position = 0;
 
-            pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
-            heightLeft -= (pageHeight - (margin * 2));
+            pdf.addImage(imgData, 'PNG', xOffset, margin, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - margin);
 
             while (heightLeft > 0) {
-                position -= (pageHeight - margin);
+                position -= (pageHeight - (margin * 2));
                 pdf.addPage();
-                pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
-                heightLeft -= (pageHeight - (margin * 2));
+                pdf.addImage(imgData, 'PNG', xOffset, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
             }
             
             pdf.save('simulacao_financiamento.pdf');
 
         } catch (error) {
             console.error("Erro ao gerar PDF:", error);
-            alert("Ocorreu um erro ao gerar o PDF. No Brave, verifique se os 'Shields' estão desativados.");
+            alert("Ocorreu um erro ao gerar o PDF.");
         } finally {
+            // PASSO 6: Limpeza
+            document.body.removeChild(printContainer);
+
+            // Restaura o botão na tela original
             btnGerarPdf.textContent = originalButtonText;
             btnGerarPdf.disabled = false;
-            btnGerarPdf.style.display = 'block';
-
-            // Restaura estilos da tabela para o layout mobile
-            tableWrapper.style.overflowX = originalWrapperOverflow;
-            tableContainer.style.minWidth = originalContainerMinWidth;
-
-            // Restaura estilos de rolagem vertical
-            document.body.style.overflow = originalBodyOverflow;
-            document.body.style.height = originalBodyHeight;
         }
-                // --- NOVO: LÓGICA PARA O MENU DROPDOWN FUNCIONAR EM TODOS OS DISPOSITIVOS ---
     });
+    // --- NOVO: LÓGICA PARA O MENU DROPDOWN FUNCIONAR EM TODOS OS DISPOSITIVOS ---
     const calculatorSelector = document.querySelector('.calculator-selector');
     const calculatorDropdown = document.querySelector('.calculator-dropdown');
 
