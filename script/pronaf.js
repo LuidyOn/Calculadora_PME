@@ -72,6 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('total-geral').textContent = formatCurrency(0);
             return;
         }
+
+        
         let saldoDevedor = valorFinanciado;
         let totalJuros = 0;
         let dataVencimentoAnterior = dataLiberacao;
@@ -205,6 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnGerarPdf.disabled = false;
         }
     });
+    
     // --- NOVO: LÓGICA PARA O MENU DROPDOWN FUNCIONAR EM TODOS OS DISPOSITIVOS ---
     const calculatorSelector = document.querySelector('.calculator-selector');
     const calculatorDropdown = document.querySelector('.calculator-dropdown');

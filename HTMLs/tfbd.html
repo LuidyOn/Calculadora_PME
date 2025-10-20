@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador TFBD Rural</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <div id="capture" class="simulator-container">
+        <header>
+            <div class="logo">
+                <span class="logo-main">Simulador de Financiamento</span>
+                <span class="logo-sub">PME</span>
+            </div>
+            <div class="calculator-selector">
+                <span id="current-calculator">Simulador TFBD Rural</span> &#9662;
+                <div class="calculator-dropdown">
+                    <a href="../index.html">Página Inicial</a>
+                    <a href="pronaf.html">Simulador AG: Pronaf</a>
+                    <a href="moderfrota.html">Simulador Moderfrota</a>
+                    <a href="tfbd.html">Simulador TFBD Rural</a>
+                </div>
+            </div>
+        </header>
+
+        <form id="loan-form">
+            <div class="form-grid">
+                <div class="form-column">
+                    <div class="form-group read-only"><label>LIBERAÇÃO:</label><span id="liberacao"></span></div>
+                    
+                    <div class="form-group"><label for="pessoa">PESSOA:</label><select id="pessoa"><option value="PJ" selected>PJ</option><option value="PF">PF</option></select></div>
+                    
+                    <div class="form-group"><label for="segmento">SEGMENTO:</label><select id="segmento"><option value="AG" selected>AG</option><option value="CE">CE</option></select></div>
+
+                    <div class="form-group"><label for="empresa">EMPRESA:</label><select id="empresa"><option value="MPME" selected>MPME</option><option value="GDE">GDE</option></select></div>
+                    <div class="form-group"><label for="valorBem">VALOR DO BEM:</label><input type="text" id="valorBem" value="100.000,00" inputmode="numeric"></div>
+                    <div class="form-group"><label for="percEntrada">Porcentagem de Entrada:</label><input type="number" id="percEntrada" value="20"></div>
+                    <div class="form-group read-only"><label>ENTRADA:</label><span id="valorEntrada"></span></div>
+                    
+                    <div class="form-group read-only"><label>VALOR FINANCIADO:</label><span id="valorFinanciado"></span></div>
+                </div>
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="periodicidade">PERIODICIDADE DE AMORTIZAÇÃO:</label>
+                        <select id="periodicidade">
+                            <option value="ANUAL" selected>ANUAL</option>
+                            <option value="SEMESTRAL">SEMESTRAL</option>
+                            <option value="MENSAL">MENSAL</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="taxaContratacao">TAXA PARA CONTRATAÇÃO:</label><input type="number" id="taxaContratacao" value="8.20" step="0.1"></div>
+                    <div class="form-group read-only"><label>CET (a.a.%):</label><span id="cetAA"></span></div>
+                    <div class="form-group"><label for="parcelas">PARCELAS:</label><input type="number" id="parcelas" value="8"></div>
+                    <div class="form-group read-only"><label>PARCELAS DE PRINCIPAL:</label><span id="parcelasPrincipal"></span></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label for="primeiroVencimento">PRIMEIRO VENCIMENTO (informar):</label><input type="date" id="primeiroVencimento"></div>
+                <div class="form-group-inline"><label>CARÊNCIA (EM MESES) entre 3 e 18 meses</label><input type="number" id="carencia" readonly></div>
+            </div>
+        </form>
+
+        <div class="observations">
+            <p><strong>**OBSERVAÇÕES**</strong></p>
+            <ul> <li>Simulação não inclui a tarifa de abertura de crédito.</li>
+                <li>O fluxo apresenta valores aproximados, que poderão variar de acordo com cada operação e normas do BNDES. Os valores apresentados não são vinculativos.</li>
+                <li>Simulação sujeita a aprovação de crédito conforme política do Banco CNHI Capital.</li>
+                <li>A TFBD segue a flutuação diária informada pelo BNDES. A taxa total apresentada compõe-se do cálculo dos últimos 30 (trinta) dias. A taxa que valerá para o financiamento será a cotação fixada na data da contratação da operação. Além disso, a taxa final também dependerá do prazo de liberação de recursos, que deverá ocorrer em até 120 dias.</li>
+                <li>Esta simulação não inclui o custo de variação cambial. Todas as liberações (em R$) são convertidas para a Unidade Monetária 604 (UM 604) do portal de moedas contratuais do BNDES, arredondando em 4 casas decimais, para apuração do saldo devedor. Os valores a pagar em UM604 nas datas de pagamento já são conhecidos de antemão, visto que as taxas de juros prefixadas já são conhecidas no protocolo ou na contratação das operações.</li>
+            </ul>
+        </div>
+
+        <div class="table-wrapper">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PARCELA</th>
+                            <th>VENCIMENTO</th>
+                            <th>DIAS</th>
+                            <th>SALDO DEVEDOR</th>
+                            <th>VENCIMENTO</th>
+                            <th>JUROS</th>
+                            <th>PRINCIPAL</th>
+                            <th>TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortization-body"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="table-footer-total">
+            <span>TOTAL</span>
+            <span id="total-juros"></span>
+            <span id="total-principal"></span>
+            <span id="total-geral"></span>
+        </div>
+
+        <div class="actions">
+            <button id="btn-gerar-pdf">Gerar PDF</button>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../script/tfbd.js"></script>
+
+    <div id="pdf-modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Informações para o PDF</h2>
+        <p>Por favor, preencha os campos abaixo para gerar o documento.</p>
+        <div class="form-group">
+            <label for="vendedor-name">Seu Nome (Vendedor):</label>
+            <input type="text" id="vendedor-name" placeholder="Digite seu nome completo">
+        </div>
+        <div class="form-group">
+            <label for="cliente-name">Nome do Cliente:</label>
+            <input type="text" id="cliente-name" placeholder="Digite o nome completo do cliente">
+        </div>
+        <div class="modal-actions">
+            <button id="btn-cancel-pdf">Cancelar</button>
+            <button id="btn-confirm-pdf" class="primary">Confirmar e Gerar PDF</button>
+        </div>
+    </div>
+    </div>
+
+</body>
+</html>

@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('valorFinanciado').textContent = formatCurrency(valorFinanciado);
         document.getElementById('parcelasPrincipal').textContent = numParcelas;
         document.getElementById('total-principal').textContent = formatCurrency(valorFinanciado);
-        
+                
         const tbody = document.getElementById('amortization-body');
         tbody.innerHTML = '';
         if (numParcelas <= 0 || isNaN(dataLiberacao.getTime()) || isNaN(dataPrimeiroVencimento.getTime()) || valorFinanciado <= 0) {
