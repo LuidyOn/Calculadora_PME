@@ -141,9 +141,8 @@
                     </thead>
                     <tbody id="amortization-body"></tbody>
                     <tfoot id="amortization-foot">
-                        <tr>
-                            <td colspan="4"><strong>TOTAL À DIREITA <span style="font-size: 1.5em;">&#8594;</span></strong></td>
-                            <td id="total-juros"></td>
+                        <tr class="final-total-row"> <td colspan="4">TOTAL À DIREITA →</td> 
+                            <td id="total-juros"></td> 
                             <td id="total-principal"></td>
                             <td id="total-geral"></td>
                         </tr>
@@ -158,5 +157,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="../script/moderfrota.js"></script>
+
+    <div id="pdf-modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Informações para o PDF</h2>
+        <p>Por favor, preencha os campos abaixo para gerar o documento.</p>
+        <div class="form-group">
+            <label for="vendedor-name">Seu Nome (Vendedor):</label>
+            <input type="text" id="vendedor-name" placeholder="Digite seu nome completo">
+        </div>
+        <div class="form-group">
+            <label for="cliente-name">Nome do Cliente:</label>
+            <input type="text" id="cliente-name" placeholder="Digite o nome completo do cliente">
+        </div>
+        <div class="modal-actions">
+            <button id="btn-cancel-pdf">Cancelar</button>
+            <button id="btn-confirm-pdf" class="primary">Confirmar e Gerar PDF</button>
+        </div>
+    </div>
+    </div>
+
 </body>
 </html>

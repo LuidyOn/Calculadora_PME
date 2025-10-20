@@ -357,7 +357,7 @@ th:nth-child(n+3), td:nth-child(n+3) {
     font-size: 9px;
 }
 .pdf-compact-mode .observations ul {
-    font-size: 7px;
+    font-size: 8px;
     padding-left: 12px;
     margin: 0;
 }
@@ -416,28 +416,33 @@ tfoot td:nth-last-child(3)
     text-align: right;
 }
 
-/* Se for preciso alinhar o TOTAL À DIREITA no rodapé */
-.pdf-compact-mode tfoot td:first-child {
-    text-align: left;
-}
+/* --- NOVO: Estilos específicos para a linha de total na tabela --- */
 
-/* --- NOVO: Estilos para a calculadora TFBD --- */
-.table-footer-total {
-    display: flex;
-    justify-content: flex-end;
-    gap: 20px;
-    padding: 10px;
+/* Estilo da linha de total */
+.final-total-row {
     background-color: var(--dark-blue);
     color: white;
     font-weight: bold;
-    margin-top: -1px;
+    font-size: 1.1em; /* Ajuste o tamanho se necessário */
 }
-.table-footer-total span {
-    min-width: 120px;
-    text-align: right;
+.final-total-row td {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    /* vertical-align: middle !important; já deve estar na regra geral de th, td */
 }
-.table-footer-total span:first-child {
-    margin-right: auto;
+
+/* Alinhamento EXPLÍCITO para as células de total no tfoot */
+.final-total-row #total-juros,
+.final-total-row #total-principal,
+.final-total-row #total-geral {
+    text-align: right !important; 
+}
+.final-total-row td:first-child { /* Célula com o texto "TOTAL" */
+    text-align: left !important; /* Ou 'center' se preferir */
+}
+
+/* Se for preciso alinhar o TOTAL À DIREITA no rodapé */
+.pdf-compact-mode tfoot td:first-child {
     text-align: left;
 }
 

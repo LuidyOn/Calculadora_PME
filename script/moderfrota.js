@@ -113,44 +113,103 @@ document.addEventListener('DOMContentLoaded', () => {
     formatarValor(valorBemInput);
     calcularTudo();
 
-    // LÓGICA FINAL E UNIFICADA PARA GERAR PDF (CENTRALIZADO COMPACTO E COMPATÍVEL COM IPHONE)
+    // LÓGICA ATUALIZADA PARA O FLUXO DE PDF COM MODAL
+    // LÓGICA FINAL E COMPLETA PARA O FLUXO DE PDF COM MODAL
     const btnGerarPdf = document.getElementById('btn-gerar-pdf');
-    btnGerarPdf.addEventListener('click', async () => {
+    const modalOverlay = document.getElementById('pdf-modal-overlay');
+    const btnCancelPdf = document.getElementById('btn-cancel-pdf');
+    const btnConfirmPdf = document.getElementById('btn-confirm-pdf');
+
+    // O botão principal da página agora só abre a janela (modal)
+    btnGerarPdf.addEventListener('click', () => {
+        modalOverlay.classList.add('show');
+    });
+
+    // O botão de cancelar na janela fecha a janela
+    btnCancelPdf.addEventListener('click', () => {
+        modalOverlay.classList.remove('show');
+    });
+
+    // Clicar no fundo escuro também fecha a janela
+    modalOverlay.addEventListener('click', (event) => {
+        if (event.target === modalOverlay) {
+            modalOverlay.classList.remove('show');
+        }
+    });
+
+    // O botão de confirmar na janela valida os nomes e chama a função para gerar o PDF
+    btnConfirmPdf.addEventListener('click', () => {
+        const vendedorName = document.getElementById('vendedor-name').value;
+        const clienteName = document.getElementById('cliente-name').value;
+
+        if (!vendedorName || !clienteName) {
+            alert('Por favor, preencha ambos os nomes para continuar.');
+            return;
+        }
+        
+        // Fecha a janela e inicia a geração do PDF
+        modalOverlay.classList.remove('show');
+        generatePdf(vendedorName, clienteName);
+    });
+
+
+    /**
+     * Esta é a função completa que faz todo o trabalho de gerar o PDF.
+     * O bloco try/catch/finally está aqui dentro.
+     */
+
+    // A função de gerar PDF inteira, com as correções
+    async function generatePdf(vendedor, cliente) {
         const originalElement = document.getElementById('capture');
+        const btnGerarPdf = document.getElementById('btn-gerar-pdf'); // Pega o botão original
         const originalButtonText = btnGerarPdf.textContent;
 
         btnGerarPdf.textContent = 'Gerando...';
         btnGerarPdf.disabled = true;
         
-        // PASSO 1: Clonar o elemento que queremos imprimir
+        // PASSO 1: Clonar o elemento
         const clone = originalElement.cloneNode(true);
 
-        // OCULTA O BOTÃO DE GERAR PDF NO CLONE
-        const btnClone = clone.querySelector('#btn-gerar-pdf');
-        if (btnClone) {
-            btnClone.style.display = 'none';
+        // <<< CORREÇÃO DO BOTÃO: Encontra o container de ações DENTRO do clone e o esconde
+        const clonedActionsDiv = clone.querySelector('.actions');
+        if (clonedActionsDiv) {
+            clonedActionsDiv.style.display = 'none';
         }
 
-        // PASSO 2: Criar um container de impressão fora da tela
+        // Adiciona as informações do vendedor/cliente no cabeçalho do clone
+        const header = clone.querySelector('header');
+        if (header) {
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'pdf-info';
+            infoDiv.innerHTML = `
+                <p><strong>Vendedor:</strong> ${vendedor}</p>
+                <p><strong>Cliente:</strong> ${cliente}</p>
+                <p><strong>Data da Simulação:</strong> ${new Date().toLocaleString('pt-BR', {dateStyle: 'short', timeStyle: 'short'})}</p>
+            `;
+            header.appendChild(infoDiv);
+        }
+        
+        // PASSO 2: Criar o container de impressão fora da tela
         const printContainer = document.createElement('div');
         printContainer.style.position = 'absolute';
         printContainer.style.left = '0';
         printContainer.style.top = '-9999px';
         printContainer.style.width = '1200px';
-        
-        // <<< MUDANÇA AQUI: Adiciona a classe de modo compacto NO CONTAINER
         printContainer.classList.add('pdf-compact-mode');
         
-        // Adiciona o clone ao container e o container ao body
         printContainer.appendChild(clone);
         document.body.appendChild(printContainer);
         
-        // REMOVEMOS a linha que adicionava a classe ao clone.
-        // clone.classList.add('pdf-compact-mode'); // Linha antiga removida
-
-        await new Promise(resolve => setTimeout(resolve, 150));
-
         try {
+            await new Promise(resolve => setTimeout(resolve, 150));
+
+            // <<< CORREÇÃO DAS OBSERVAÇÕES: Força a renderização do elemento
+            const obsClone = clone.querySelector('.observations');
+            if (obsClone) {
+                // Um truque para forçar o navegador a calcular os estilos do elemento
+                window.getComputedStyle(obsClone).opacity;
+            }
+
             if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
                 console.error("jsPDF não está carregado ou acessível.");
                 alert("Erro ao carregar a funcionalidade de PDF.");
@@ -158,16 +217,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const { jsPDF } = window.jspdf;
 
-            // PASSO 3: Capturar o CLONE, que agora está dentro do container com o modo compacto
-            const canvas = await html2canvas(clone, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-            });
+            // PASSO 3: Capturar o CLONE
+            const canvas = await html2canvas(clone, { scale: 2, useCORS: true });
             
             // PASSO 4: Recortar o canvas
             const scale = 2;
-            const contentWidth = clone.offsetWidth * scale;
+            const contentWidth = (clone.offsetWidth + 20) * scale;
             const contentHeight = canvas.height;
             const destinationCanvas = document.createElement('canvas');
             destinationCanvas.width = contentWidth;
@@ -207,12 +262,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             // PASSO 6: Limpeza
             document.body.removeChild(printContainer);
-
-            // Restaura o botão na tela original
-            btnGerarPdf.textContent = originalButtonText;
+            btnGerarPdf.textContent = originalButtonText; // Usa a variável salva no início
             btnGerarPdf.disabled = false;
         }
-    });
+    }
+    
         // --- NOVO: LÓGICA PARA O MENU DROPDOWN FUNCIONAR EM TODOS OS DISPOSITIVOS ---
     const calculatorSelector = document.querySelector('.calculator-selector');
     const calculatorDropdown = document.querySelector('.calculator-dropdown');
