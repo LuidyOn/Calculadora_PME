@@ -129,6 +129,7 @@ header {
     background-color: #3193f5; /* Fundo de campo bloqueado */
 }
 
+
 .form-row {
     display: flex; 
     flex-direction: column; 
@@ -145,6 +146,14 @@ header {
     border-radius: 4px; 
     margin-top: 10px;
 }
+
+/* --- NOVO: Define fundo mais escuro para campos readonly --- */
+.form-group input[readonly] {
+    background-color: #d6d6d6 !important; /* Tom de cinza mais escuro (padrão Bootstrap para readonly) */
+    /* Você pode escolher outra cor se preferir, ex: #d6d6d6 */
+    
+}
+
 .form-group-inline label { font-weight: bold; }
 .form-group-inline input { width: 60px; }
 
@@ -334,7 +343,7 @@ th:nth-child(n+3), td:nth-child(n+3) {
     align-items: center;
     justify-content: flex-end;
     font-weight: bold;
-    background-color: #e9ecef;
+    background-color: #d6d6d6;
     max-height: 10px; /* Altura fixa e consistente */
 }
 

@@ -40,10 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const liberacaoInput = document.getElementById('liberacao'); const vencimentoInput = document.getElementById('primeiroVencimento'); const carenciaInput = document.getElementById('carencia'); const dataLiberacao = new Date(liberacaoInput.value + 'T00:00:00'); const dataPrimeiroVencimento = new Date(vencimentoInput.value + 'T00:00:00'); if (isNaN(dataLiberacao.getTime()) || isNaN(dataPrimeiroVencimento.getTime())) { carenciaInput.value = 0; return; } const mesesDiferenca = (dataPrimeiroVencimento.getFullYear() - dataLiberacao.getFullYear()) * 12 + (dataPrimeiroVencimento.getMonth() - dataLiberacao.getMonth()); carenciaInput.value = mesesDiferenca; if (mesesDiferenca > 14) { alert("A carência não pode exceder 14 meses. A data do primeiro vencimento será ajustada."); let dataMaxima = new Date(dataLiberacao); dataMaxima.setMonth(dataMaxima.getMonth() + 14); const yyyy = dataMaxima.getFullYear(); const mm = String(dataMaxima.getMonth() + 1).padStart(2, '0'); const dd = String(dataMaxima.getDate()).padStart(2, '0'); vencimentoInput.value = `${yyyy}-${mm}-${dd}`; carenciaInput.value = 14; vencimentoInput.dispatchEvent(new Event('input')); }
     }
 
-    const inputs = document.querySelectorAll('#valorBem, #percEntrada, #parcelas, #taxaAA, #liberacao, #primeiroVencimento, #periodicidade');
+    const inputs = document.querySelectorAll('#valorBem, #percEntrada, #parcelas, #taxaAA, #liberacao, #primeiroVencimento, #periodicidade'); // Adicionado #percEntrada
     inputs.forEach(input => input.addEventListener('input', calcularTudo));
 
-    const formatCurrency = (value) => value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formatCurrency = (value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     const formatDate = (date) => isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
 
     function calcularTudo(event) {
@@ -52,15 +52,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const valorBemStr = document.getElementById('valorBem').value.replace(/\./g, '').replace(',', '.');
         const valorBem = parseFloat(valorBemStr) || 0;
         const percEntrada = parseFloat(document.getElementById('percEntrada').value) || 0;
-        const valorFinanciado = valorBem * ((100 - percEntrada) / 100);
+        // Calcula o VALOR da entrada
+        const valorEntrada = valorBem * (percEntrada / 100);
+        // Calcula o VALOR FINANCIADO
+        const valorFinanciado = valorBem - valorEntrada;
         const numParcelas = parseInt(document.getElementById('parcelas').value) || 1;
         const taxaAA = parseFloat(document.getElementById('taxaAA').value) / 100 || 0;
         
         const cetAA = taxaAA;
         const cetAM = (Math.pow(1 + cetAA, 1/12) - 1);
 
-        document.getElementById('cetAA').textContent = (cetAA * 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
-        document.getElementById('cetAM').textContent = (cetAM * 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
+        document.getElementById('cetAA').value = (cetAA * 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
+        document.getElementById('cetAM').value = (cetAM * 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
         // --- FIM DA ALTERAÇÃO ---
 
         const dataLiberacao = new Date(document.getElementById('liberacao').value + 'T00:00:00');
@@ -68,8 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const periodicidade = document.getElementById('periodicidade').value;
         const principalPorParcela = numParcelas > 0 ? valorFinanciado / numParcelas : 0;
         
-        document.getElementById('valorFinanciado').textContent = formatCurrency(valorFinanciado);
-        document.getElementById('parcelasPrincipal').textContent = numParcelas;
+        // Atualiza os campos na tela (usando .value para os inputs readonly)
+        document.getElementById('valorEntrada').value = formatCurrency(valorEntrada); // Atualiza o novo campo
+        document.getElementById('valorFinanciado').value = formatCurrency(valorFinanciado);
+        document.getElementById('parcelasPrincipal').value = numParcelas;
         document.getElementById('total-principal').textContent = formatCurrency(valorFinanciado);
                 
         const tbody = document.getElementById('amortization-body');

@@ -27,7 +27,10 @@
         <form id="loan-form">
             <div class="form-grid">
                 <div class="form-column">
-                    <div class="form-group read-only"><label>LIBERAÇÃO:</label><span id="liberacao"></span></div>
+                    <div class="form-group read-only">
+                        <label for="liberacao">LIBERAÇÃO:</label>
+                        <input type="text" id="liberacao" readonly>
+                    </div>
                     
                     <div class="form-group"><label for="pessoa">PESSOA:</label><select id="pessoa"><option value="PJ" selected>PJ</option><option value="PF">PF</option></select></div>
                     
@@ -36,9 +39,15 @@
                     <div class="form-group"><label for="empresa">EMPRESA:</label><select id="empresa"><option value="MPME" selected>MPME</option><option value="GDE">GDE</option></select></div>
                     <div class="form-group"><label for="valorBem">VALOR DO BEM:</label><input type="text" id="valorBem" value="100.000,00" inputmode="numeric"></div>
                     <div class="form-group"><label for="percEntrada">Porcentagem de Entrada:</label><input type="number" id="percEntrada" value="20"></div>
-                    <div class="form-group read-only"><label>ENTRADA:</label><span id="valorEntrada"></span></div>
+                    <div class="form-group read-only">
+                        <label for="valorEntrada">ENTRADA:</label>
+                        <input type="text" id="valorEntrada" readonly>
+                    </div>
                     
-                    <div class="form-group read-only"><label>VALOR FINANCIADO:</label><span id="valorFinanciado"></span></div>
+                    <div class="form-group read-only">
+                        <label for="valorFinanciado">VALOR FINANCIADO:</label>
+                        <input type="text" id="valorFinanciado" readonly>
+                    </div>
                 </div>
                 <div class="form-column">
                     <div class="form-group">
@@ -50,9 +59,22 @@
                         </select>
                     </div>
                     <div class="form-group"><label for="taxaContratacao">TAXA PARA CONTRATAÇÃO:</label><input type="number" id="taxaContratacao" value="8.20" step="0.1"></div>
-                    <div class="form-group read-only"><label>CET (a.a.%):</label><span id="cetAA"></span></div>
-                    <div class="form-group"><label for="parcelas">PARCELAS:</label><input type="number" id="parcelas" value="8"></div>
-                    <div class="form-group read-only"><label>PARCELAS DE PRINCIPAL:</label><span id="parcelasPrincipal"></span></div>
+
+                    <div class="form-group read-only">
+                        <label for="cetAA">CET (a.a.%):</label> 
+                        <input type="text" id="cetAA" readonly> 
+                    </div>
+
+                    <div class="form-group">
+                        <label for="parcelas">PARCELAS:</label>
+                        <input type="number" id="parcelas" value="8">
+                    </div>
+
+                    <div class="form-group read-only">
+                        <label for="parcelasPrincipal">PARCELAS DE PRINCIPAL:</label>
+                        <input type="text" id="parcelasPrincipal" readonly>
+                    </div>
+                    
                 </div>
             </div>
             <div class="form-row">

@@ -1,12 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- ELEMENTOS DO DOM ---
     const liberacaoSpan = document.getElementById('liberacao');
-    const valorBemInput = document.getElementById('valorBem');
+    const valorBemInput = document.getElementById('valorBem'); // Pega o campo
+    valorBemInput.addEventListener('input', () => formatarValor(valorBemInput)); // Chama a máscara ao digitar
     
     // --- FUNÇÕES DE FORMATAÇÃO E INICIALIZAÇÃO ---
     function setInitialDate() {
         const today = new Date();
-        liberacaoSpan.textContent = today.toLocaleDateString('pt-BR');
+        liberacaoSpan.value = today.toLocaleDateString('pt-BR');
     }
 
     function setDefaultVencimento() {
@@ -20,8 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatarValor(input) {
-        let valor = input.value.replace(/\D/g, '');
-        if (valor === '') { input.value = ''; return; }
+        let valor = input.value.replace(/\D/g, ''); // Remove tudo que não for dígito
+        if (valor === '') {
+            input.value = '';
+            return;
+        }
+        // Converte para número, divide por 100 para tratar os centavos e formata
         let numero = parseFloat(valor) / 100;
         input.value = numero.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
@@ -92,10 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const principalPorParcela = numParcelas > 0 ? valorFinanciado / numParcelas : 0;
 
-        document.getElementById('valorEntrada').textContent = formatCurrency(valorEntrada);
-        document.getElementById('valorFinanciado').textContent = formatCurrency(valorFinanciado);
-        document.getElementById('cetAA').textContent = (taxaAA * 100).toFixed(2).replace('.', ',') + '%';
-        document.getElementById('parcelasPrincipal').textContent = numParcelas;
+        document.getElementById('valorEntrada').value = formatCurrency(valorEntrada);
+        document.getElementById('valorFinanciado').value = formatCurrency(valorFinanciado);
+        document.getElementById('cetAA').value = (taxaAA * 100).toFixed(2).replace('.', ',') + '%';
+        document.getElementById('parcelasPrincipal').value = numParcelas;
 
         const tbody = document.getElementById('amortization-body');
         tbody.innerHTML = '';

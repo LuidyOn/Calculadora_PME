@@ -54,16 +54,22 @@
                         <input type="text" id="valorBem" value="100.000,00" inputmode="numeric">
                     </div>
                     <div class="form-group">
-                        <label for="percEntrada">% DE ENTRADA:</label>
-                        <input type="number" id="percEntrada" value="0">
+                        <label for="percEntrada">PORCENTAGEM DE ENTRADA:</label>
+                        <input type="number" id="percEntrada" value="0"> 
+                    </div>
+
+                    <div class="form-group read-only">
+                        <label for="valorEntrada">ENTRADA:</label>
+                        <input type="text" id="valorEntrada" readonly> 
+                    </div>
+
+                    <div class="form-group read-only">
+                        <label for="valorFinanciado">VALOR FINANCIADO:</label>
+                        <input type="text" id="valorFinanciado" readonly>
                     </div>
                     <div class="form-group read-only">
-                        <label>VALOR FINANCIADO:</label>
-                        <span id="valorFinanciado"></span>
-                    </div>
-                    <div class="form-group read-only">
-                        <label>IOF:</label>
-                        <span>-</span>
+                        <label for="iof">IOF:</label>
+                        <input type="text" id="iof" value="-" readonly> 
                     </div>
                 </div>
                 <div class="form-column">
@@ -84,12 +90,12 @@
                         <input type="number" id="taxaAA" value="5.00" step="0.1">
                     </div>
                     <div class="form-group read-only">
-                        <label>CET (A.A.%):</label>
-                        <span id="cetAA">5,00%</span>
+                        <label for="cetAA">CET (a.a.%):</label> 
+                        <input type="text" id="cetAA" readonly> 
                     </div>
                     <div class="form-group read-only">
-                        <label>PARCELAS DE PRINCIPAL:</label>
-                        <span id="parcelasPrincipal"></span>
+                        <label for="parcelasPrincipal">PARCELAS DE PRINCIPAL:</label>
+                        <input type="text" id="parcelasPrincipal" readonly>
                     </div>
                 </div>
             </div>
