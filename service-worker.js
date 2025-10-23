@@ -1,8 +1,8 @@
-// service-worker.js
+// service-worker.js (VERSÃO ATUALIZADA)
 
-const CACHE_NAME = 'simulador-financeiro-cache-v1'; // Nome do cache (mude 'v1' se atualizar os arquivos)
+const CACHE_NAME = 'simulador-financeiro-cache-v1.1'; // Mantenha ou incremente a versão se mudar os arquivos cacheados
 const urlsToCache = [
-  '/', // Atalho para o index.html na raiz
+  '/',
   '/index.html',
   '/manifest.json',
   '/style/style.css',
@@ -13,41 +13,31 @@ const urlsToCache = [
   '/HTMLs/pronaf.html',
   '/HTMLs/moderfrota.html',
   '/HTMLs/tfbd.html',
-  // Adicione aqui os caminhos para seus ÍCONES (essencial!)
   '/icons/logo_newholland_192px.jpg',
   '/icons/logo_newholland_512px.jpg',
-  // logos
+    // logos
   '/logos/LOGO_AMARELA.png',
-  // Adicione quaisquer outras imagens ou fontes que seu site use
-  // '/images/logo.png', 
-  // '/fonts/meufonte.woff2',
-
-  // NÃO adicione aqui os scripts de bibliotecas externas (jsPDF, html2canvas) via CDN.
-  // O Service Worker focará nos seus arquivos locais.
+  // Adicione outros assets se necessário
 ];
 
-// Evento 'install': Ocorre quando o Service Worker é instalado pela primeira vez.
-// Aqui nós abrimos o cache e adicionamos nossos arquivos essenciais.
+// --- Evento 'install' (sem mudanças) ---
 self.addEventListener('install', event => {
   console.log('Service Worker: Instalando...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Service Worker: Abrindo cache e adicionando arquivos...');
+        console.log('Service Worker: Abrindo cache...');
         return cache.addAll(urlsToCache);
       })
       .then(() => {
-        console.log('Service Worker: Arquivos adicionados ao cache com sucesso!');
-        return self.skipWaiting(); // Força a ativação imediata do novo SW
+        console.log('Service Worker: Cache preenchido!');
+        return self.skipWaiting();
       })
-      .catch(error => {
-        console.error('Service Worker: Falha ao adicionar arquivos ao cache', error);
-      })
+      .catch(error => console.error('Service Worker: Falha no cache', error))
   );
 });
 
-// Evento 'activate': Ocorre quando o Service Worker é ativado.
-// Aqui limpamos caches antigos para evitar conflitos.
+// --- Evento 'activate' (sem mudanças) ---
 self.addEventListener('activate', event => {
   console.log('Service Worker: Ativando...');
   event.waitUntil(
@@ -61,57 +51,54 @@ self.addEventListener('activate', event => {
         })
       );
     }).then(() => {
-       console.log('Service Worker: Ativado com sucesso!');
-       return self.clients.claim(); // Garante que o SW controle as páginas abertas imediatamente
+       console.log('Service Worker: Ativado!');
+       return self.clients.claim();
     })
   );
 });
 
-// Evento 'fetch': Ocorre toda vez que a página tenta buscar um recurso (arquivo, imagem, etc.).
-// Esta é a mágica do offline: tentamos pegar do cache primeiro.
+// --- Evento 'fetch' (LÓGICA ATUALIZADA) ---
 self.addEventListener('fetch', event => {
-  // Ignora requisições que não são GET (como POSTs para um servidor, se houvesse)
-  if (event.request.method !== 'GET') {
+  // Ignora requisições não-GET ou de extensões
+  if (event.request.method !== 'GET' || event.request.url.startsWith('chrome-extension://')) {
       return;
   }
 
-  // Ignora requisições para extensões do Chrome
-  if (event.request.url.startsWith('chrome-extension://')) {
-      return;
-  }
-
+  // Estratégia: Cache first, then network, with fallback for navigation
   event.respondWith(
     caches.match(event.request)
-      .then(response => {
-        // Se encontrarmos o arquivo no cache, retorna ele imediatamente.
-        if (response) {
-          // console.log('Service Worker: Recurso encontrado no cache:', event.request.url);
-          return response;
+      .then(cachedResponse => {
+        // Se encontrar no cache, retorna imediatamente
+        if (cachedResponse) {
+          // console.log('SW: Servindo do cache:', event.request.url);
+          return cachedResponse;
         }
 
-        // Se não encontrar no cache, tenta buscar na rede.
-        // console.log('Service Worker: Recurso não encontrado no cache, buscando na rede:', event.request.url);
+        // Se não encontrar no cache, busca na rede
+        // console.log('SW: Buscando na rede:', event.request.url);
         return fetch(event.request).then(
           networkResponse => {
-            // Se a busca na rede falhar (offline), não fazemos nada (poderíamos mostrar uma página offline genérica aqui)
-            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-               // console.log('Service Worker: Falha ao buscar na rede ou resposta inválida:', event.request.url);
-               return networkResponse; // Retorna a resposta de erro (ex: 'offline')
-            }
-
-            // Opcional: Se quiser que novos arquivos sejam cacheados dinamicamente
-            // let responseToCache = networkResponse.clone();
-            // caches.open(CACHE_NAME)
-            //   .then(cache => {
-            //     cache.put(event.request, responseToCache);
-            //   });
-
+            // Se a busca na rede funcionou, retorna a resposta da rede
+            // (Opcional: você poderia clonar e colocar no cache aqui se quisesse)
             return networkResponse;
           }
         ).catch(error => {
-            console.error('Service Worker: Erro ao buscar na rede', error);
-            // Aqui você poderia retornar uma resposta offline personalizada, se quisesse
-            // return new Response('Você está offline.', { status: 503, statusText: 'Service Unavailable' });
+          // <<< A MÁGICA ESTÁ AQUI >>>
+          // Se a busca na rede FALHAR (estamos offline)...
+          console.log('SW: Fetch falhou; offline?', event.request.url, error);
+          
+          // ...verifica se é uma requisição de NAVEGAÇÃO (ex: digitar URL, clicar link)
+          if (event.request.mode === 'navigate') {
+            // Se for navegação, retorna SEMPRE o index.html principal do cache.
+            // Isso garante que o "aplicativo" sempre abra, mesmo offline.
+            console.log('SW: Falha na navegação, servindo /index.html do cache.');
+            return caches.match('/'); // Ou '/index.html', dependendo do que você cacheou como raiz
+          }
+          
+          // Se não for navegação (ex: falha ao buscar uma imagem não cacheada), 
+          // apenas retorna o erro (ou poderia retornar uma imagem placeholder).
+          // Retornar 'undefined' aqui geralmente resulta no erro padrão "sem conexão" do navegador para aquele recurso específico.
+          return undefined; 
         });
       })
   );
