@@ -8,15 +8,15 @@
   "theme_color": "#004a99",
   "icons": [
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "/icons/logo_newholland_192px.jpg",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/jpg",
       "purpose": "any maskable" 
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "/icons/logo_newholland_512px.jpg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/jpg",
       "purpose": "any maskable"
     }
   ]
