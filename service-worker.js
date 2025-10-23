@@ -1,6 +1,6 @@
 // service-worker.js (VERSÃO ATUALIZADA)
 
-const CACHE_NAME = 'simulador-financeiro-cache-v1.3'; // Mantenha ou incremente a versão se mudar os arquivos cacheados
+const CACHE_NAME = 'simulador-financeiro-cache-v1.4'; // Mantenha ou incremente a versão se mudar os arquivos cacheados
 const urlsToCache = [
   '/',
   '/index.html',
