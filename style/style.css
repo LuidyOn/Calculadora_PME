@@ -56,6 +56,16 @@ header {
     cursor: pointer; 
     box-sizing: border-box;
 }
+
+.logo-image {
+    max-width: 150px;
+    height: auto;
+    margin-top: 5px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .calculator-dropdown {
     display: none; 
     position: absolute; 
