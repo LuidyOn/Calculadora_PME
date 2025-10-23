@@ -330,3 +330,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// --- REGISTRA O SERVICE WORKER ---
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js') // Caminho para o seu service worker
+      .then(registration => {
+        console.log('Service Worker registrado com sucesso:', registration);
+      })
+      .catch(error => {
+        console.error('Falha ao registrar o Service Worker:', error);
+      });
+  });
+} else {
+    console.warn('Service Worker não é suportado neste navegador.');
+}

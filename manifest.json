@@ -1,0 +1,23 @@
+{
+  "name": "Simulador de Financiamento PME",
+  "short_name": "Simulador",
+  "description": "Simulador de financiamento para linhas de crédito como Pronaf, Moderfrota e TFBD Rural.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#e9ecef",
+  "theme_color": "#004a99",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable" 
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
