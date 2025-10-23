@@ -560,3 +560,25 @@ table td {
     margin: 2px 0;
 }
 
+/* botão Adicionar Atalho à Tela Inicial */
+
+.install-app-button-container {
+    margin: 20px 0;
+    text-align: center;
+}
+
+#btn-install-app {
+    background-color: var(--accent-yellow); /* Amarelo para destaque */
+    color: var(--dark-blue); /* Texto escuro */
+    font-weight: bold;
+    font-size: 1.1em;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#btn-install-app:hover {
+    background-color: #ffda6a; /* Um amarelo mais claro no hover */
+}
