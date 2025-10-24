@@ -1,6 +1,6 @@
-// service-worker.js (VERSÃO ATUALIZADA)
+// service-worker.js (VERSÃO ROBUSTA)
 
-const CACHE_NAME = 'simulador-financeiro-cache-v1.5'; // Mantenha ou incremente a versão se mudar os arquivos cacheados
+const CACHE_NAME = 'simulador-financeiro-cache-v1.6'; // Mantenha v2 ou incremente para v3 se já tinha subido a v2
 const urlsToCache = [
   '/',
   '/index.html',
@@ -17,87 +17,76 @@ const urlsToCache = [
   '/icons/logo_newholland_512px.jpg',
     // logos
   '/logos/LOGO_AMARELA.png',
-  // Adicione outros assets se necessário
 ];
 
-// --- Evento 'install' (sem mudanças) ---
+// --- Evento 'install' ---
 self.addEventListener('install', event => {
-  console.log('Service Worker: Instalando...');
+  console.log('SW: Instalando...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Service Worker: Abrindo cache...');
+        console.log('SW: Pré-cacheando arquivos da App Shell...');
         return cache.addAll(urlsToCache);
       })
-      .then(() => {
-        console.log('Service Worker: Cache preenchido!');
-        return self.skipWaiting();
-      })
-      .catch(error => console.error('Service Worker: Falha no cache', error))
+      .then(() => self.skipWaiting())
+      .catch(error => console.error('SW: Falha no pré-cache', error))
   );
 });
 
-// --- Evento 'activate' (sem mudanças) ---
+// --- Evento 'activate' ---
 self.addEventListener('activate', event => {
-  console.log('Service Worker: Ativando...');
+  console.log('SW: Ativando...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Service Worker: Limpando cache antigo:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
+        cacheNames.filter(cacheName => cacheName !== CACHE_NAME) // Filtra para deletar SÓ os caches antigos
+                 .map(cacheName => {
+                    console.log('SW: Deletando cache antigo:', cacheName);
+                    return caches.delete(cacheName);
+                  })
       );
-    }).then(() => {
-       console.log('Service Worker: Ativado!');
-       return self.clients.claim();
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-// --- Evento 'fetch' (LÓGICA ATUALIZADA) ---
+// --- Evento 'fetch' (ESTRATÉGIA ROBUSTA) ---
 self.addEventListener('fetch', event => {
   // Ignora requisições não-GET ou de extensões
   if (event.request.method !== 'GET' || event.request.url.startsWith('chrome-extension://')) {
-      return;
+    return;
   }
 
-  // Estratégia: Cache first, then network, with fallback for navigation
+  // Estratégia: Cache first, fallback to network. For navigation errors, fallback to offline page (index.html).
   event.respondWith(
     caches.match(event.request)
       .then(cachedResponse => {
-        // Se encontrar no cache, retorna imediatamente
+        // 1. Encontrou no Cache? Entrega!
         if (cachedResponse) {
           // console.log('SW: Servindo do cache:', event.request.url);
           return cachedResponse;
         }
 
-        // Se não encontrar no cache, busca na rede
+        // 2. Não achou no Cache? Tenta a Rede.
         // console.log('SW: Buscando na rede:', event.request.url);
         return fetch(event.request).then(
           networkResponse => {
-            // Se a busca na rede funcionou, retorna a resposta da rede
-            // (Opcional: você poderia clonar e colocar no cache aqui se quisesse)
+            // 3. Rede funcionou? Entrega a resposta da rede.
+            // console.log('SW: Servindo da rede:', event.request.url);
+            // Opcional: guardar a resposta no cache aqui se desejar cache dinâmico.
             return networkResponse;
           }
         ).catch(error => {
-          // <<< A MÁGICA ESTÁ AQUI >>>
-          // Se a busca na rede FALHAR (estamos offline)...
-          console.log('SW: Fetch falhou; offline?', event.request.url, error);
-          
-          // ...verifica se é uma requisição de NAVEGAÇÃO (ex: digitar URL, clicar link)
+          // 4. Rede FALHOU (Offline ou erro)?
+          console.warn('SW: Fetch da rede falhou:', event.request.url, error);
+
+          // 5. Se foi uma NAVEGAÇÃO, entrega o index.html do cache como fallback!
           if (event.request.mode === 'navigate') {
-            // Se for navegação, retorna SEMPRE o index.html principal do cache.
-            // Isso garante que o "aplicativo" sempre abra, mesmo offline.
-            console.log('SW: Falha na navegação, servindo /index.html do cache.');
-            return caches.match('/'); // Ou '/index.html', dependendo do que você cacheou como raiz
+            console.log('SW: Falha de navegação. Servindo fallback /index.html do cache.');
+            return caches.match('/'); // Ou '/index.html'
           }
-          
-          // Se não for navegação (ex: falha ao buscar uma imagem não cacheada), 
-          // apenas retorna o erro (ou poderia retornar uma imagem placeholder).
-          // Retornar 'undefined' aqui geralmente resulta no erro padrão "sem conexão" do navegador para aquele recurso específico.
+
+          // 6. Se NÃO foi navegação (imagem, etc.), apenas retorna erro (ou um placeholder)
+          // Retornar 'undefined' deixa o navegador mostrar o erro padrão para aquele recurso.
           return undefined; 
         });
       })
