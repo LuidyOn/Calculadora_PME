@@ -65,6 +65,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const collapsibleButtons = document.querySelectorAll('.collapsible-button');
+
+    collapsibleButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Encontra o conteúdo associado a este botão
+            const content = button.nextElementSibling;
+            // Encontra o ícone +/-
+            const icon = button.querySelector('.toggle-icon');
+
+            // Alterna a classe 'active' no botão
+            button.classList.toggle('active');
+
+            // Alterna a exibição do conteúdo
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                if (icon) icon.textContent = '+'; // Muda ícone para +
+            } else {
+                content.classList.add('show');
+                if (icon) icon.textContent = '-'; // Muda ícone para -
+            }
+        });
+    });
+
     // Opcional: Ouve se o app foi instalado com sucesso
     window.addEventListener('appinstalled', () => {
       console.log('PWA foi instalado com sucesso!');

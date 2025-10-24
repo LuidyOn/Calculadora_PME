@@ -9,11 +9,24 @@
 }
 body {
     font-family: Arial, sans-serif;
-    background-color: #e9ecef; 
     color: var(--text-color);
     margin: 0;
-    padding: 10px; font-size: 14px;
+    padding: 10px; 
+    font-size: 14px;
+    min-height: 100vh; /* Garante altura mínima */
+
+    /* --- DEGRADÊ CORRIGIDO --- */
+    background-color: #e9ecef; /* Cor sólida como fallback */
+    background-image: linear-gradient(
+        to bottom, 
+        rgba(0, 74, 153, 0.3) 0%, /* Começa azul transparente no topo */
+        rgba(233, 236, 239, 0) 70%, /* Transição para transparente em 30% */
+        #e9ecef 40% /* Fica sólido cinza a partir de 40% */
+    );
+    background-repeat: no-repeat; /* Evita que o degradê se repita */
+    background-attachment: fixed; /* Opcional: fixa o degradê durante a rolagem */
 }
+
 .simulator-container {
     max-width: 900px; 
     margin: 0 auto; 
@@ -43,6 +56,7 @@ header {
     color: var(--accent-yellow); 
     font-weight: bold; 
     font-size: 16px; }
+    
 .calculator-selector {
     position: relative; 
     width: 100%; 
@@ -55,6 +69,16 @@ header {
     border-radius: 5px; 
     cursor: pointer; 
     box-sizing: border-box;
+
+    /* --- ADICIONE ESTAS LINHAS --- */
+    transition: box-shadow 0.3s ease, background-color 0.3s ease; /* Para suavizar o efeito no hover */
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); /* Deslocamento X=4px, Y=4px, Blur=8px */
+}
+
+/* Opcional: Efeito ao passar o mouse (hover) */
+.calculator-selector:hover {
+    background-color: var(--dark-blue); /* Escurece um pouco */
+    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.3); /* Sombra mais pronunciada */
 }
 
 .logo-image {
@@ -74,7 +98,7 @@ header {
     right: 0; background-color: #fff;
     border: 1px solid var(--border-color); 
     border-radius: 0 0 5px 5px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+    box-shadow: 0 6px 8px rgba(0,0,0,0.1); 
     z-index: 10;
 }
 .calculator-dropdown a { display: block; 
@@ -581,4 +605,143 @@ table td {
 
 #btn-install-app:hover {
     background-color: #ffda6a; /* Um amarelo mais claro no hover */
+}
+
+/* ========================================================== */
+/* === NOVOS ESTILOS PARA A PÁGINA INICIAL (Colapsável) === */
+/* ========================================================== */
+
+.landing-page.collapsible {
+    padding: 20px; /* Espaçamento geral */
+}
+
+/* --- Card Principal de Boas-Vindas --- */
+.welcome-card {
+    /* Reutiliza estilos de instruction-card */
+    border-radius: 7px;
+    text-align: center;
+    font-size: 0.9em;
+    margin-bottom: 50px;
+    border-left: 5px solid var(--primary-blue); /* Mantém uma borda azul */
+    padding: 10px;
+}
+.welcome-card h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.8em;
+    color: var(--dark-blue);
+}
+.welcome-card .subtitle {
+    font-size: 1.4em;
+    color: #464646;
+    margin-bottom: 20px;
+}
+.welcome-card .cta-prompt {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: var(--primary-blue);
+}
+.welcome-card .arrow { /* Animação da seta */
+    display: inline-block;
+    font-size: 1.5em;
+    vertical-align: middle;
+    animation: bounce 1.5s infinite;
+}
+@keyframes bounce { /* Garanta que a animação exista */
+  0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+  40% {transform: translateY(-8px);}
+  60% {transform: translateY(-4px);}
+}
+
+/* Classe para fundo azul claro (reutilizada) */
+.bg-light-blue {
+    background-color: rgba(0, 74, 153, 0.08);
+}
+
+
+/* --- Seções Colapsáveis --- */
+.collapsible-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espaço entre os botões */
+}
+
+.collapsible-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden; /* Importante para o efeito visual */
+    background-color: white;
+}
+
+.collapsible-button {
+    background-color: #f9f9f9; /* Fundo do botão */
+    color: var(--dark-blue);
+    cursor: pointer;
+    padding: 15px 20px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 1em; /* Tamanho da fonte do título */
+    display: flex;
+    justify-content: space-between; /* Título à esquerda, ícone à direita */
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.collapsible-button:hover {
+    background-color: #eee;
+}
+
+.collapsible-button h2 {
+    margin: 0;
+    font-size: 1.2em; /* Tamanho do título da seção */
+    display: flex;
+    align-items: center;
+}
+.collapsible-button h2::before { /* Remove ícones antigos dos h2 */
+    content: none;
+}
+
+.toggle-icon {
+    font-size: 1.5em;
+    font-weight: bold;
+    transition: transform 0.3s ease; /* Animação do ícone +/- */
+}
+
+/* Quando o botão está ativo (seção aberta) */
+.collapsible-button.active {
+    background-color: #eee; /* Fundo um pouco mais escuro */
+}
+.collapsible-button.active .toggle-icon {
+    transform: rotate(45deg); /* Gira o '+' para parecer um 'x' ou muda para '-' */
+    content: '-'; /* Opcional: muda o ícone para '-' */
+}
+
+.collapsible-content {
+    padding: 0 20px; /* Só padding lateral inicialmente */
+    max-height: 0; /* Começa fechado */
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* Animação de abrir/fechar */
+    background-color: white;
+    color: #444;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+.collapsible-content.show {
+    max-height: 500px; /* Altura máxima grande o suficiente (ajuste se precisar) */
+    padding: 15px 20px; /* Adiciona padding vertical ao abrir */
+}
+.collapsible-content ul,
+.collapsible-content ol {
+    padding-left: 25px; /* Ajuste este valor (ex: 20px, 30px) conforme necessário */
+    text-align: left; /* Garante o alinhamento à esquerda */
+}
+.collapsible-content li {
+    margin-bottom: 8px;
+}
+
+.collapsible-content ol li {
+    text-align: left;
+    margin-bottom: 10px; /* Mantém um bom espaçamento entre os itens */
 }

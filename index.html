@@ -24,27 +24,59 @@
             </div>
         </header>
 
-        <main class="landing-page">
-            <h1>Bem-vindo ao Portal de Simuladores</h1>
-            <p>
-                Utilize o menu acima para selecionar a calculadora de financiamento desejada.
-            </p>
-            <div class="install-app-button-container">
-                <button id="btn-install-app" style="display: none;">Adicionar Atalho à Tela Inicial</button> 
-            </div>
-            <p>
-                Nossas ferramentas fornecem projeções detalhadas para ajudar no seu planejamento financeiro, oferecendo simulações para diferentes linhas de crédito como Pronaf e Moderfrota.
-            </p>
-            <div class="instructions">
-                <h2>Como usar:</h2>
-                <ol>
-                    <li>Escolha uma das calculadoras no menu azul no topo da página.</li>
-                    <li>Preencha os campos com os dados da sua simulação.</li>
-                    <li>A tabela de amortização será calculada automaticamente.</li>
-                    <li>Se desejar, gere um PDF com o resultado clicando no botão correspondente.</li>
-                </ol>
-            </div>
+        <main class="landing-page collapsible"> <section class="welcome-card instruction-card bg-light-blue">           
+            <h1>Bem-vindo ao Portal de Simuladores PME</h1>
+        
+                <p class="cta-prompt">Selecione a calculadora desejada no menu azul acima <span class="arrow">↑</span></p>
+            </section>
+
+            <div class="collapsible-sections">
+
+                <div class="collapsible-item">
+                    <button class="collapsible-button">
+                        <h2>📰 O que você encontra aqui?</h2>
+                        <span class="toggle-icon">+</span>
+                    </button>
+                    <div class="collapsible-content">
+                        <p>
+                            Nossas ferramentas fornecem projeções detalhadas para ajudar no seu planejamento financeiro, oferecendo simulações para diferentes linhas de crédito como Pronaf, Moderfrota e TFBD Rural. Calcule parcelas, juros e visualize o fluxo de pagamento completo.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="collapsible-item">
+                    <button class="collapsible-button">
+                        <h2>📱 Acesso Rápido Offline!</h2>
+                        <span class="toggle-icon">+</span>
+                    </button>
+                    <div class="collapsible-content">
+                        <p>Adicione um atalho deste site à sua tela inicial para usar as calculadoras mesmo sem internet:</p>
+                        <ul>
+                            <li><strong>No Android (Chrome):</strong> Toque nos três pontinhos (⋮) no canto superior direito e escolha "Instalar aplicativo" ou "Adicionar à tela inicial".</li>
+                            <li><strong>No iPhone (Safari):</strong> Toque no ícone de compartilhamento (↑) na barra inferior e escolha "Adicionar à Tela de Início".</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="collapsible-item">
+                    <button class="collapsible-button">
+                        <h2>💡 Como Usar:</h2>
+                        <span class="toggle-icon">+</span>
+                    </button>
+                    <div class="collapsible-content">
+                        <ol>
+                            <li>Escolha uma das calculadoras no menu azul no topo.</li>
+                            <li>Preencha os campos com os dados da sua simulação.</li>
+                            <li>A tabela de amortização será calculada automaticamente.</li>
+                            <li>Gere um PDF com o resultado clicando no botão correspondente.</li>
+                            <li>Preencha os nomes (seu e do cliente) na janela que aparecerá antes de gerar o PDF.</li>
+                            
+                        </ol>
+                    </div>
+                </div>
+            </div> 
         </main>
+
     </div>
     <script src="./script/main.js"></script>
 </body>

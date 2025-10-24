@@ -1,6 +1,6 @@
 // service-worker.js (VERSÃO ROBUSTA)
 
-const CACHE_NAME = 'simulador-financeiro-cache-v1.7'; // Mantenha v2 ou incremente para v3 se já tinha subido a v2
+const CACHE_NAME = 'simulador-financeiro-cache-v1.8'; // Mantenha v2 ou incremente para v3 se já tinha subido a v2
 const urlsToCache = [
   '/Calculadora_PME/',                     // <<< Caminho raiz do projeto
   '/Calculadora_PME/index.html',           
