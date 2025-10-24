@@ -2,19 +2,20 @@
   "name": "Simulador de Financiamento PME",
   "short_name": "Simulador",
   "description": "Simulador de financiamento para linhas de crédito como Pronaf, Moderfrota e TFBD Rural.",
-  "start_url": "/index.html",
+  "start_url": "/Calculadora_PME/",
+  "scope": "/Calculadora_PME/",
   "display": "standalone",
   "background_color": "#e9ecef",
   "theme_color": "#004a99",
   "icons": [
     {
-      "src": "/icons/logo_newholland_192px.jpg",
+      "src": "/Calculadora_PME/icons/logo_newholland_192px.jpg",
       "sizes": "192x192",
       "type": "image/jpg",
       "purpose": "any maskable" 
     },
     {
-      "src": "/icons/logo_newholland_512px.jpg",
+      "src": "/Calculadora_PME/icons/logo_newholland_512px.jpg",
       "sizes": "512x512",
       "type": "image/jpg",
       "purpose": "any maskable"

@@ -1,22 +1,22 @@
 // service-worker.js (VERSÃO ROBUSTA)
 
-const CACHE_NAME = 'simulador-financeiro-cache-v1.6'; // Mantenha v2 ou incremente para v3 se já tinha subido a v2
+const CACHE_NAME = 'simulador-financeiro-cache-v1.7'; // Mantenha v2 ou incremente para v3 se já tinha subido a v2
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/style/style.css',
-  '/script/main.js',
-  '/script/pronaf.js',
-  '/script/moderfrota.js',
-  '/script/tfbd.js',
-  '/HTMLs/pronaf.html',
-  '/HTMLs/moderfrota.html',
-  '/HTMLs/tfbd.html',
-  '/icons/logo_newholland_192px.jpg',
-  '/icons/logo_newholland_512px.jpg',
+  '/Calculadora_PME/',                     // <<< Caminho raiz do projeto
+  '/Calculadora_PME/index.html',           
+  '/Calculadora_PME/manifest.json',        
+  '/Calculadora_PME/style/style.css',      
+  '/Calculadora_PME/script/main.js',       
+  '/Calculadora_PME/script/pronaf.js',     
+  '/Calculadora_PME/script/moderfrota.js', 
+  '/Calculadora_PME/script/tfbd.js',       
+  '/Calculadora_PME/HTMLs/pronaf.html',    
+  '/Calculadora_PME/HTMLs/moderfrota.html',
+  '/Calculadora_PME/HTMLs/tfbd.html',     
+  '/Calculadora_PME/icons/logo_newholland_192px.jpg',
+  '/Calculadora_PME/icons/logo_newholland_512px.jpg',
     // logos
-  '/logos/LOGO_AMARELA.png',
+  '/Calculadora_PME/logos/LOGO_AMARELA.png',
 ];
 
 // --- Evento 'install' ---
@@ -81,8 +81,8 @@ self.addEventListener('fetch', event => {
 
           // 5. Se foi uma NAVEGAÇÃO, entrega o index.html do cache como fallback!
           if (event.request.mode === 'navigate') {
-            console.log('SW: Falha de navegação. Servindo fallback /index.html do cache.');
-            return caches.match('/'); // Ou '/index.html'
+            console.log('SW: Falha de navegação. Servindo fallback /Calculadora_PME/index.html do cache.');
+            return caches.match('/Calculadora_PME/index.html'); 
           }
 
           // 6. Se NÃO foi navegação (imagem, etc.), apenas retorna erro (ou um placeholder)

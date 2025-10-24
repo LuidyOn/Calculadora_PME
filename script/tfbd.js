@@ -334,13 +334,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- REGISTRA O SERVICE WORKER ---
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js', { scope: '/' }) // <<< ADICIONE { scope: '/' }
-      .then(registration => {
-        console.log('Service Worker registrado com sucesso no escopo raiz:', registration);
-      })
-      .catch(error => {
+    navigator.serviceWorker.register('/Calculadora_PME/service-worker.js', { scope: '/Calculadora_PME/' })
+    .then(registration => {
+        console.log('Service Worker registrado com sucesso no escopo:', registration.scope);
+    })
+    .catch(error => {
         console.error('Falha ao registrar o Service Worker:', error);
-      });
+    });
   });
 } else {
     console.warn('Service Worker não é suportado neste navegador.');
