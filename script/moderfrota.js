@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // A função de gerar PDF inteira, com as correções
     async function generatePdf(vendedor, cliente) {
         const originalElement = document.getElementById('capture');
-        const btnGerarPdf = document.getElementById('btn-gerar-pdf'); // Pega o botão original
+        const btnGerarPdf = document.getElementById('btn-gerar-pdf');
         const originalButtonText = btnGerarPdf.textContent;
 
         btnGerarPdf.textContent = 'Gerando...';
@@ -174,12 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // PASSO 1: Clonar o elemento
         const clone = originalElement.cloneNode(true);
-
-        // <<< CORREÇÃO DO BOTÃO: Encontra o container de ações DENTRO do clone e o esconde
         const clonedActionsDiv = clone.querySelector('.actions');
-        if (clonedActionsDiv) {
-            clonedActionsDiv.style.display = 'none';
-        }
+        if (clonedActionsDiv) clonedActionsDiv.style.display = 'none';
 
         // Adiciona as informações do vendedor/cliente no cabeçalho do clone
         const header = clone.querySelector('header');
@@ -194,13 +190,37 @@ document.addEventListener('DOMContentLoaded', () => {
             header.appendChild(infoDiv);
         }
         
-        // PASSO 2: Criar o container de impressão fora da tela
+        // PASSO 2: Criar container off-screen
         const printContainer = document.createElement('div');
         printContainer.style.position = 'absolute';
         printContainer.style.left = '0';
         printContainer.style.top = '-9999px';
         printContainer.style.width = '1200px';
-        printContainer.classList.add('pdf-compact-mode');
+        printContainer.classList.add('pdf-compact-mode'); // Aplica modo compacto no container
+
+        // <<< A MÁGICA PARA O CSS OFFLINE >>>
+        let styleElement = null; // Variável para guardar o style injetado
+        try {
+            // Tenta buscar o conteúdo do CSS (virá do cache offline)
+            const cssPath = '../style/style.css'; // Ajuste o caminho se necessário!
+            const response = await fetch(cssPath);
+            if (!response.ok) throw new Error(`CSS não encontrado: ${response.statusText}`);
+            const cssText = await response.text();
+
+            // Cria um elemento <style> e injeta o CSS
+            styleElement = document.createElement('style');
+            styleElement.textContent = cssText;
+            printContainer.appendChild(styleElement); // Adiciona ao container ANTES do clone
+
+        } catch (cssError) {
+            console.error("Erro ao carregar ou injetar CSS para PDF:", cssError);
+            alert("Não foi possível carregar os estilos para o PDF. Verifique sua conexão ou tente limpar o cache.");
+            // Restaura o botão em caso de erro ANTES de tentar gerar
+            btnGerarPdf.textContent = originalButtonText;
+            btnGerarPdf.disabled = false;
+            return; // Aborta a geração do PDF
+        }
+        // <<< FIM DA MÁGICA >>>
         
         printContainer.appendChild(clone);
         document.body.appendChild(printContainer);
@@ -208,21 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await new Promise(resolve => setTimeout(resolve, 150));
 
-            // <<< CORREÇÃO DAS OBSERVAÇÕES: Força a renderização do elemento
-            const obsClone = clone.querySelector('.observations');
-            if (obsClone) {
-                // Um truque para forçar o navegador a calcular os estilos do elemento
-                window.getComputedStyle(obsClone).opacity;
-            }
-
-            if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
-                console.error("jsPDF não está carregado ou acessível.");
-                alert("Erro ao carregar a funcionalidade de PDF.");
-                return;
-            }
+            if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) throw new Error("jsPDF não carregado.");
             const { jsPDF } = window.jspdf;
 
-            // PASSO 3: Capturar o CLONE
+            // PASSO 3: Capturar o CLONE (que agora tem os estilos injetados)
             const canvas = await html2canvas(clone, { scale: 2, useCORS: true });
             
             // PASSO 4: Recortar o canvas
@@ -266,8 +275,11 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Ocorreu um erro ao gerar o PDF.");
         } finally {
             // PASSO 6: Limpeza
+            if (printContainer && printContainer.parentNode === document.body) {
+                document.body.removeChild(printContainer); // Remove o container com clone e style
+            }
             document.body.removeChild(printContainer);
-            btnGerarPdf.textContent = originalButtonText; // Usa a variável salva no início
+            btnGerarPdf.textContent = originalButtonText;
             btnGerarPdf.disabled = false;
         }
     }
