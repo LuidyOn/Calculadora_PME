@@ -48,7 +48,10 @@ header {
 .logo { 
     display: flex; 
     flex-direction: column; 
-    margin-bottom: 10px; }
+    margin-bottom: 10px; 
+    align-items: center; /* Centraliza horizontalmente o texto e a imagem */
+    text-align: center;  /* Garante que o texto fique no meio */
+}
 .logo-main { 
     color: var(--primary-blue); 
     font-weight: bold; font-size: 20px; }
@@ -73,6 +76,10 @@ header {
     /* --- ADICIONE ESTAS LINHAS --- */
     transition: box-shadow 0.3s ease, background-color 0.3s ease; /* Para suavizar o efeito no hover */
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); /* Deslocamento X=4px, Y=4px, Blur=8px */
+
+    /* --- AJUSTES FINAIS --- */
+        z-index: 5;            /* Garante que o menu abra por cima do brilho */
+        text-align: center;    /* <<< ADICIONE ISSO: Centraliza o texto e a seta */
 }
 
 /* Opcional: Efeito ao passar o mouse (hover) */
@@ -617,19 +624,18 @@ table td {
 
 /* --- Card Principal de Boas-Vindas --- */
 .welcome-card {
-    /* Reutiliza estilos de instruction-card */
-    border-radius: 7px;
+    background: #fff; /* Fundo branco para limpeza */
+    border-left: 6px solid var(--accent-yellow); /* Borda AMARELA para chamar atenção (marca PME) */
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Sombra suave para dar profundidade */
+    margin-bottom: 40px;
     text-align: center;
-    font-size: 0.9em;
-    margin-bottom: 50px;
-    border-left: 5px solid var(--primary-blue); /* Mantém uma borda azul */
-    padding: 10px;
 }
 .welcome-card h1 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.8em;
-    color: var(--dark-blue);
+    color: var(--primary-blue);
+    font-size: 1.6em; /* Um pouco mais elegante */
+    margin-bottom: 15px;
 }
 .welcome-card .subtitle {
     font-size: 1.4em;
@@ -637,9 +643,12 @@ table td {
     margin-bottom: 20px;
 }
 .welcome-card .cta-prompt {
-    font-weight: bold;
-    font-size: 1.1em;
+    background-color: rgba(0, 74, 153, 0.1); /* Fundo azul bem clarinho só no texto */
+    padding: 8px 15px;
+    border-radius: 20px; /* Formato de "pílula" */
+    display: inline-block;
     color: var(--primary-blue);
+    font-weight: 600;
 }
 .welcome-card .arrow { /* Animação da seta */
     display: inline-block;
@@ -666,11 +675,13 @@ table td {
     gap: 15px; /* Espaço entre os botões */
 }
 
+/* Removemos a borda padrão e adicionamos sombra */
 .collapsible-item {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden; /* Importante para o efeito visual */
-    background-color: white;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 15px; /* Mais espaço entre eles */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03); /* Sombra leve */
+    background-color: transparent; /* Deixa o background ser controlado pelo botão/conteúdo */
 }
 
 .collapsible-button {
@@ -689,8 +700,12 @@ table td {
     transition: background-color 0.3s ease;
 }
 
+/* Efeito ao passar o mouse */
 .collapsible-button:hover {
-    background-color: #eee;
+    background-color: #fff;
+    transform: translateY(-2px); /* Levanta levemente */
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    border-color: #eee;
 }
 
 .collapsible-button h2 {
@@ -704,14 +719,23 @@ table td {
 }
 
 .toggle-icon {
-    font-size: 1.5em;
-    font-weight: bold;
-    transition: transform 0.3s ease; /* Animação do ícone +/- */
+    font-size: 1.2em;
+    width: 32px;
+    height: 32px;
+    background-color: rgba(0, 74, 153, 0.1); /* Bolinha azul claro */
+    color: var(--primary-blue);
+    border-radius: 50%; /* Faz virar um círculo perfeito */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
 }
 
-/* Quando o botão está ativo (seção aberta) */
+/* Quando estiver aberto (Active) */
 .collapsible-button.active {
-    background-color: #eee; /* Fundo um pouco mais escuro */
+    background-color: var(--primary-blue); /* Fica AZUL quando aberto */
+    color: #fff; /* Texto branco */
+    border-radius: 10px 10px 0 0; /* Arredonda só em cima */
 }
 .collapsible-button.active .toggle-icon {
     transform: rotate(45deg); /* Gira o '+' para parecer um 'x' ou muda para '-' */
@@ -725,7 +749,7 @@ table td {
     transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* Animação de abrir/fechar */
     background-color: white;
     color: #444;
-    font-size: 0.95em;
+    font-size: 1.1em; 
     line-height: 1.6;
 }
 .collapsible-content.show {
@@ -745,3 +769,87 @@ table td {
     text-align: left;
     margin-bottom: 10px; /* Mantém um bom espaçamento entre os itens */
 }
+
+/* --- FIM DOS ESTILOS DA PÁGINA INICIAL COLAPSÁVEL --- */
+
+/* --- Estilos para os Banners de Imagem (Correção Full-Width) --- */
+.banner-container {
+    /* 1. Compensa o padding de 20px do container pai */
+    margin-left: -20px;
+    margin-right: -20px;
+    
+    /* 2. Calcula a largura total somando os 40px que "roubamos" das margens */
+    width: calc(100% + 40px);
+    
+    /* Ajustes visuais */
+    margin-top: 0; /* Encosta no header */
+    margin-bottom: 30px; /* Espaço embaixo */
+    height: 300px; /* Altura do banner */
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+.banner-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Garante que a imagem preencha tudo sem distorcer */
+    object-position: center;
+    display: block;
+}
+
+/* Ajuste para telas menores (celulares) */
+@media (max-width: 768px) {
+    .banner-container {
+        height: 180px; /* Altura menor no celular */
+        /* Mantemos as margens negativas pois o padding do pai continua existindo no mobile */
+    }
+}
+
+/* --- Efeitos index --- */
+
+/* --- Efeito de Brilho (Shine) Versão "Menu Livre" --- */
+
+.calculator-selector {
+    /* Mantemos as configurações originais importantes */
+    position: relative;
+    /* REMOVIDO: overflow: hidden; -> Isso era o que matava o menu! */
+    
+    /* Garante que o menu (z-index 10) fique acima de tudo */
+    z-index: 5; 
+}
+
+.calculator-selector::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0; /* Ocupa exatamente o tamanho do botão */
+    
+    /* Arredonda o brilho igual ao botão para não vazar nos cantos */
+    border-radius: 5px; 
+    
+    /* O Gradiente do Brilho */
+    background: linear-gradient(
+        120deg, 
+        transparent 0%, 
+        transparent 40%, 
+        rgba(255, 255, 255, 0.6) 50%, /* Intensidade do brilho */
+        transparent 60%, 
+        transparent 100%
+    );
+    
+    /* Truque: fazemos o fundo ser largo (250%) para podermos movê-lo */
+    background-size: 250% 100%;
+    background-repeat: no-repeat;
+    
+    /* A Animação move apenas a POSIÇÃO do fundo, não o elemento em si */
+    animation: shine-sweep 6s infinite linear;
+    
+    pointer-events: none; /* Deixa o clique passar para o botão */
+}
+
+/* A nova animação move o gradiente lá dentro */
+@keyframes shine-sweep {
+    0% { background-position: 250% 0; }
+    100% { background-position: -150% 0; }
+}
+
