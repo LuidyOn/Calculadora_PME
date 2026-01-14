@@ -88,7 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const percEntrada = parseFloat(document.getElementById('percEntrada').value) || 0;
         const numParcelas = parseInt(document.getElementById('parcelas').value) || 1;
         const taxaAA = parseFloat(document.getElementById('taxaContratacao').value) / 100 || 0;
-        const dataPrimeiroVencimento = new Date(document.getElementById('primeiroVencimento').value + 'T00:00:00');
+        
+        // CORREÇÃO: Data Base Fixa
+        const dataPrimeiroVencimentoOriginal = new Date(document.getElementById('primeiroVencimento').value + 'T00:00:00');
         const periodicidade = document.getElementById('periodicidade').value;
         const dataLiberacao = new Date();
 
@@ -111,14 +113,18 @@ document.addEventListener('DOMContentLoaded', () => {
         let dataVencimentoAnterior = dataLiberacao;
 
         for (let i = 1; i <= numParcelas; i++) {
-            let dataBaseVencimento = new Date(dataPrimeiroVencimento);
+            // LÓGICA CORRIGIDA: Data calculada sobre a original
+            let dataBaseVencimento = new Date(dataPrimeiroVencimentoOriginal);
             if (i > 1) {
+                const parcelasAdicionais = i - 1;
                 // Lógica de periodicidade
-                if (periodicidade === 'ANUAL') dataBaseVencimento.setFullYear(dataVencimentoAnterior.getFullYear() + 1);
-                else if (periodicidade === 'SEMESTRAL') dataBaseVencimento.setMonth(dataVencimentoAnterior.getMonth() + 6);
-                else dataBaseVencimento.setMonth(dataVencimentoAnterior.getMonth() + 1);
+                if (periodicidade === 'ANUAL') dataBaseVencimento.setFullYear(dataBaseVencimento.getFullYear() + parcelasAdicionais);
+                else if (periodicidade === 'SEMESTRAL') dataBaseVencimento.setMonth(dataBaseVencimento.getMonth() + (parcelasAdicionais * 6));
+                else dataBaseVencimento.setMonth(dataBaseVencimento.getMonth() + parcelasAdicionais);
             }
+            
             let dataRealVencimento = ajustarParaProximoDiaUtil(dataBaseVencimento);
+            
             const diffTime = Math.abs(dataRealVencimento - dataVencimentoAnterior);
             const diasCorridos = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             const juros = saldoDevedor * (taxaAA / 365) * diasCorridos;
@@ -210,6 +216,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const clonedActionsDiv = clone.querySelector('.actions');
         if (clonedActionsDiv) clonedActionsDiv.style.display = 'none';
 
+        // --- CORREÇÃO DE DATAS NO PDF (Formato PT-BR Visual) ---
+        const dateInputs = clone.querySelectorAll('input[type="date"]');
+        dateInputs.forEach(input => {
+            if (input.value) {
+                const span = document.createElement('span');
+                const [ano, mes, dia] = input.value.split('-');
+                span.textContent = `${dia}/${mes}/${ano}`;
+                span.className = input.className; 
+                span.style.cssText = window.getComputedStyle(input).cssText;
+                span.style.border = '1px solid #ccc'; 
+                span.style.display = 'flex';
+                span.style.alignItems = 'center';
+                span.style.justifyContent = 'flex-end'; 
+                input.parentNode.replaceChild(span, input);
+            }
+        });
+
         // Adiciona as informações do vendedor/cliente no cabeçalho do clone
         const header = clone.querySelector('header');
         if (header) {
@@ -247,11 +270,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (cssError) {
             console.error("Erro ao carregar ou injetar CSS para PDF:", cssError);
-            alert("Não foi possível carregar os estilos para o PDF. Verifique sua conexão ou tente limpar o cache.");
-            // Restaura o botão em caso de erro ANTES de tentar gerar
-            btnGerarPdf.textContent = originalButtonText;
-            btnGerarPdf.disabled = false;
-            return; // Aborta a geração do PDF
         }
         // <<< FIM DA MÁGICA >>>
         
@@ -259,27 +277,42 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(printContainer);
         
         try {
-            await new Promise(resolve => setTimeout(resolve, 150));
+            await new Promise(resolve => setTimeout(resolve, 200));
 
             if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) throw new Error("jsPDF não carregado.");
             const { jsPDF } = window.jspdf;
 
-            // PASSO 3: Capturar o CLONE (que agora tem os estilos injetados)
-            const canvas = await html2canvas(clone, { scale: 2, useCORS: true });
-            
-            // PASSO 4: Recortar o canvas
+            // 1. Escala 2 (Qualidade Original) + Fundo Branco na captura
             const scale = 2;
+            const canvas = await html2canvas(clone, { 
+                scale: scale, 
+                useCORS: true,
+                backgroundColor: '#ffffff' // Garante fundo branco na captura
+            });
+            
+            // 2. Correção da Barra Preta no Canvas de Destino
             const contentWidth = (clone.offsetWidth + 20) * scale;
             const contentHeight = canvas.height;
+            
             const destinationCanvas = document.createElement('canvas');
             destinationCanvas.width = contentWidth;
             destinationCanvas.height = contentHeight;
             const ctx = destinationCanvas.getContext('2d');
-            ctx.drawImage(canvas, 0, 0, contentWidth, contentHeight, 0, 0, contentWidth, contentHeight);
             
-            const imgData = destinationCanvas.toDataURL('image/png');
+            // --- A CURA DA BARRA PRETA ---
+            // Pintamos todo o fundo de BRANCO antes de desenhar a imagem.
+            // Isso garante que a margem extra (+20) seja branca, não transparente (que vira preta no JPEG).
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, destinationCanvas.width, destinationCanvas.height);
             
-            // PASSO 5: Adicionar a imagem recortada e consistente ao PDF
+            // Desenhamos a imagem capturada sobre o fundo branco
+            // Usamos as dimensões originais do canvas para não esticar
+            ctx.drawImage(canvas, 0, 0);
+            
+            // 3. Otimização de Tamanho (JPEG 0.8)
+            // Reduz de ~14MB para ~200-400KB mantendo o layout
+            const imgData = destinationCanvas.toDataURL('image/jpeg', 0.8);
+            
             const pdf = new jsPDF('p', 'mm', 'a4');
             const margin = 10;
             const pageWidth = pdf.internal.pageSize.getWidth();
@@ -291,17 +324,18 @@ document.addEventListener('DOMContentLoaded', () => {
             let heightLeft = imgHeight;
             let position = 0;
 
-            pdf.addImage(imgData, 'PNG', xOffset, margin, imgWidth, imgHeight);
+            pdf.addImage(imgData, 'JPEG', xOffset, margin, imgWidth, imgHeight);
             heightLeft -= (pageHeight - margin);
 
             while (heightLeft > 0) {
                 position -= (pageHeight - (margin * 2));
                 pdf.addPage();
-                pdf.addImage(imgData, 'PNG', xOffset, position, imgWidth, imgHeight);
+                pdf.addImage(imgData, 'JPEG', xOffset, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
             }
             
-            pdf.save('simulacao_financiamento.pdf');
+            // Lembre-se de ajustar o nome do arquivo para cada simulador (ex: simulacao_pronaf.pdf)
+            pdf.save('simulacao_tfbd.pdf');
 
         } catch (error) {
             console.error("Erro ao gerar PDF:", error);
@@ -311,7 +345,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (printContainer && printContainer.parentNode === document.body) {
                 document.body.removeChild(printContainer); // Remove o container com clone e style
             }
-            document.body.removeChild(printContainer);
             btnGerarPdf.textContent = originalButtonText;
             btnGerarPdf.disabled = false;
         }

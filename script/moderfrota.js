@@ -30,6 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     valorBemInput.addEventListener('input', () => formatarValor(valorBemInput));
 
+    // --- NOVO: TRAVA DE 15% PARA MODERFROTA ---
+    const percEntradaInput = document.getElementById('percEntrada');
+    if (percEntradaInput) {
+        percEntradaInput.value = 15;
+    }
+    percEntradaInput.addEventListener('change', () => {
+        let valor = parseFloat(percEntradaInput.value) || 0;
+        if (valor < 15) {
+            alert("Para Moderfrota, a entrada mínima obrigatória é de 15%.");
+            percEntradaInput.value = 15;
+            calcularTudo(); // Força o recálculo
+        }
+    });
+
     // Funções e lista de feriados para cálculo de dias úteis
     const feriadosNacionais = [ "2025-01-01", "2025-03-03", "2025-03-04", "2025-04-18", "2025-04-21", "2025-05-01", "2025-06-19", "2025-09-07", "2025-10-12", "2025-11-02", "2025-11-15", "2025-11-20", "2025-12-25", "2026-01-01", "2026-04-03", "2026-04-21", "2026-05-01", "2026-06-04", "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25" ];
     function isDiaUtil(date) { const diaDaSemana = date.getDay(); if (diaDaSemana === 0 || diaDaSemana === 6) return false; const dataFormatada = date.toISOString().slice(0, 10); if (feriadosNacionais.includes(dataFormatada)) return false; return true; }
@@ -67,7 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- FIM DA ALTERAÇÃO ---
 
         const dataLiberacao = new Date(document.getElementById('liberacao').value + 'T00:00:00');
-        const dataPrimeiroVencimento = new Date(document.getElementById('primeiroVencimento').value + 'T00:00:00');
+        // USAR DATA FIXA DO INPUT PARA NÃO OCORRER DRIFT (mudança de data gradual)
+        const dataPrimeiroVencimentoOriginal = new Date(document.getElementById('primeiroVencimento').value + 'T00:00:00');
+        
         const periodicidade = document.getElementById('periodicidade').value;
         const principalPorParcela = numParcelas > 0 ? valorFinanciado / numParcelas : 0;
         
@@ -79,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
         const tbody = document.getElementById('amortization-body');
         tbody.innerHTML = '';
-        if (numParcelas <= 0 || isNaN(dataLiberacao.getTime()) || isNaN(dataPrimeiroVencimento.getTime()) || valorFinanciado <= 0) {
+        if (numParcelas <= 0 || isNaN(dataLiberacao.getTime()) || isNaN(dataPrimeiroVencimentoOriginal.getTime()) || valorFinanciado <= 0) {
             document.getElementById('total-juros').textContent = formatCurrency(0);
             document.getElementById('total-geral').textContent = formatCurrency(0);
             return;
@@ -89,15 +105,26 @@ document.addEventListener('DOMContentLoaded', () => {
         let saldoDevedor = valorFinanciado;
         let totalJuros = 0;
         let dataVencimentoAnterior = dataLiberacao;
+
         for (let i = 1; i <= numParcelas; i++) {
-            let dataVencimentoCalculada;
-            if (i === 1) { dataVencimentoCalculada = new Date(dataPrimeiroVencimento); } else {
-                dataVencimentoCalculada = new Date(dataVencimentoAnterior);
-                if (periodicidade === 'ANUAL') { dataVencimentoCalculada.setFullYear(dataVencimentoAnterior.getFullYear() + 1); }
-                else if (periodicidade === 'SEMESTRAL') { dataVencimentoCalculada.setMonth(dataVencimentoAnterior.getMonth() + 6); }
-                else { dataVencimentoCalculada.setMonth(dataVencimentoAnterior.getMonth() + 1); }
+            // LÓGICA CORRIGIDA: Calcula a data base sempre a partir da data original (evita pular dias)
+            let dataBaseVencimento = new Date(dataPrimeiroVencimentoOriginal);
+            
+            if (i > 1) { 
+                const parcelasAdicionais = i - 1;
+                if (periodicidade === 'ANUAL') { 
+                    dataBaseVencimento.setFullYear(dataBaseVencimento.getFullYear() + parcelasAdicionais); 
+                } else if (periodicidade === 'SEMESTRAL') { 
+                    dataBaseVencimento.setMonth(dataBaseVencimento.getMonth() + (parcelasAdicionais * 6)); 
+                } else { 
+                    // Caso ainda exista mensal ou seja adicionado depois
+                    dataBaseVencimento.setMonth(dataBaseVencimento.getMonth() + parcelasAdicionais); 
+                }
             }
-            const dataVencimentoAtual = ajustarParaProximoDiaUtil(dataVencimentoCalculada);
+
+            // Ajusta se cair em FDS/Feriado, mas isso não afeta a dataBase da próxima iteração
+            const dataVencimentoAtual = ajustarParaProximoDiaUtil(dataBaseVencimento);
+            
             const diffTime = Math.abs(dataVencimentoAtual - dataVencimentoAnterior);
             const diasCorridos = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             const juros = saldoDevedor * (taxaAA / 365) * diasCorridos;
@@ -177,6 +204,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const clonedActionsDiv = clone.querySelector('.actions');
         if (clonedActionsDiv) clonedActionsDiv.style.display = 'none';
 
+        // --- CORREÇÃO DE DATAS NO PDF (Formato PT-BR Visual) ---
+        // Transforma os inputs type="date" em spans de texto DD/MM/AAAA
+        const dateInputs = clone.querySelectorAll('input[type="date"]');
+        dateInputs.forEach(input => {
+            if (input.value) {
+                const span = document.createElement('span');
+                const [ano, mes, dia] = input.value.split('-');
+                span.textContent = `${dia}/${mes}/${ano}`;
+                // Copia estilos básicos para manter consistência visual
+                span.className = input.className; 
+                span.style.cssText = window.getComputedStyle(input).cssText;
+                span.style.border = '1px solid #ccc'; // Garante borda visível
+                span.style.display = 'flex';
+                span.style.alignItems = 'center';
+                span.style.justifyContent = 'flex-end'; // Alinha à direita
+                input.parentNode.replaceChild(span, input);
+            }
+        });
+
         // Adiciona as informações do vendedor/cliente no cabeçalho do clone
         const header = clone.querySelector('header');
         if (header) {
@@ -214,11 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (cssError) {
             console.error("Erro ao carregar ou injetar CSS para PDF:", cssError);
-            alert("Não foi possível carregar os estilos para o PDF. Verifique sua conexão ou tente limpar o cache.");
-            // Restaura o botão em caso de erro ANTES de tentar gerar
-            btnGerarPdf.textContent = originalButtonText;
-            btnGerarPdf.disabled = false;
-            return; // Aborta a geração do PDF
+            // Continua mesmo sem CSS externo, usando o que tiver
         }
         // <<< FIM DA MÁGICA >>>
         
@@ -226,27 +268,42 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(printContainer);
         
         try {
-            await new Promise(resolve => setTimeout(resolve, 150));
+            await new Promise(resolve => setTimeout(resolve, 200));
 
             if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) throw new Error("jsPDF não carregado.");
             const { jsPDF } = window.jspdf;
 
-            // PASSO 3: Capturar o CLONE (que agora tem os estilos injetados)
-            const canvas = await html2canvas(clone, { scale: 2, useCORS: true });
-            
-            // PASSO 4: Recortar o canvas
+            // 1. Escala 2 (Qualidade Original) + Fundo Branco na captura
             const scale = 2;
+            const canvas = await html2canvas(clone, { 
+                scale: scale, 
+                useCORS: true,
+                backgroundColor: '#ffffff' // Garante fundo branco na captura
+            });
+            
+            // 2. Correção da Barra Preta no Canvas de Destino
             const contentWidth = (clone.offsetWidth + 20) * scale;
             const contentHeight = canvas.height;
+            
             const destinationCanvas = document.createElement('canvas');
             destinationCanvas.width = contentWidth;
             destinationCanvas.height = contentHeight;
             const ctx = destinationCanvas.getContext('2d');
-            ctx.drawImage(canvas, 0, 0, contentWidth, contentHeight, 0, 0, contentWidth, contentHeight);
             
-            const imgData = destinationCanvas.toDataURL('image/png');
+            // --- A CURA DA BARRA PRETA ---
+            // Pintamos todo o fundo de BRANCO antes de desenhar a imagem.
+            // Isso garante que a margem extra (+20) seja branca, não transparente (que vira preta no JPEG).
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, destinationCanvas.width, destinationCanvas.height);
             
-            // PASSO 5: Adicionar a imagem recortada e consistente ao PDF
+            // Desenhamos a imagem capturada sobre o fundo branco
+            // Usamos as dimensões originais do canvas para não esticar
+            ctx.drawImage(canvas, 0, 0);
+            
+            // 3. Otimização de Tamanho (JPEG 0.8)
+            // Reduz de ~14MB para ~200-400KB mantendo o layout
+            const imgData = destinationCanvas.toDataURL('image/jpeg', 0.8);
+            
             const pdf = new jsPDF('p', 'mm', 'a4');
             const margin = 10;
             const pageWidth = pdf.internal.pageSize.getWidth();
@@ -258,17 +315,18 @@ document.addEventListener('DOMContentLoaded', () => {
             let heightLeft = imgHeight;
             let position = 0;
 
-            pdf.addImage(imgData, 'PNG', xOffset, margin, imgWidth, imgHeight);
+            pdf.addImage(imgData, 'JPEG', xOffset, margin, imgWidth, imgHeight);
             heightLeft -= (pageHeight - margin);
 
             while (heightLeft > 0) {
                 position -= (pageHeight - (margin * 2));
                 pdf.addPage();
-                pdf.addImage(imgData, 'PNG', xOffset, position, imgWidth, imgHeight);
+                pdf.addImage(imgData, 'JPEG', xOffset, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
             }
             
-            pdf.save('simulacao_financiamento.pdf');
+            // Lembre-se de ajustar o nome do arquivo para cada simulador (ex: simulacao_pronaf.pdf)
+            pdf.save('simulacao_moderfrota.pdf');
 
         } catch (error) {
             console.error("Erro ao gerar PDF:", error);
@@ -278,7 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (printContainer && printContainer.parentNode === document.body) {
                 document.body.removeChild(printContainer); // Remove o container com clone e style
             }
-            document.body.removeChild(printContainer);
             btnGerarPdf.textContent = originalButtonText;
             btnGerarPdf.disabled = false;
         }
