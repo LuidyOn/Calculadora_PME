@@ -186,6 +186,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const clonedActionsDiv = clone.querySelector('.actions');
         if (clonedActionsDiv) clonedActionsDiv.style.display = 'none';
 
+        // --- CORREÇÃO DA LOGO ---
+        // Converte a logo original em Base64 para garantir que o html2canvas consiga lê-la
+        const originalLogo = document.querySelector('.logo-image');
+        const clonedLogo = clone.querySelector('.logo-image');
+        
+        if (originalLogo && clonedLogo && originalLogo.complete) {
+            try {
+                const canvasLogo = document.createElement('canvas');
+                canvasLogo.width = originalLogo.naturalWidth;
+                canvasLogo.height = originalLogo.naturalHeight;
+                const ctxLogo = canvasLogo.getContext('2d');
+                ctxLogo.drawImage(originalLogo, 0, 0);
+                // Substitui o link "../logos/..." pelo código da imagem direta
+                clonedLogo.src = canvasLogo.toDataURL('image/png');
+            } catch (err) {
+                console.warn("Erro ao converter logo para PDF (possível bloqueio de segurança/CORS):", err);
+            }
+        }
+
         // --- CORREÇÃO DE DATAS NO PDF (Formato PT-BR Visual) ---
         const dateInputs = clone.querySelectorAll('input[type="date"]');
         dateInputs.forEach(input => {
