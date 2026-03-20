@@ -864,3 +864,213 @@ table td {
     opacity: 0.7;            /* Leve transparência */
     user-select: none;       /* Impede que o usuário selecione o texto sem querer */
 }
+
+
+/* ========================================================== */
+/* === AJUSTES CIRÚRGICOS DA HOME =========================== */
+/* ========================================================== */
+
+/* remove o brilho animado do botão principal */
+.calculator-selector::after {
+    display: none;
+}
+
+/* melhora o banner sem perder a estrutura full-width */
+.banner-container {
+    border: 1px solid #d8e0ea;
+    border-radius: 12px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+    background-color: #ffffff;
+}
+
+/* remove o card de boas-vindas da lógica visual antiga */
+.welcome-card {
+    display: none;
+}
+
+/* agora os blocos colapsáveis herdam a ideia da borda amarela */
+.collapsible-sections {
+    gap: 18px;
+}
+
+.collapsible-item {
+    border-left: 6px solid var(--accent-yellow);
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #ffffff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    margin-bottom: 0;
+}
+
+.collapsible-button {
+    background-color: #ffffff;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.collapsible-button:hover {
+    background-color: #fcfcfc;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+}
+
+.collapsible-button.active {
+    background-color: var(--primary-blue);
+    color: #ffffff;
+    border-radius: 0;
+}
+
+.collapsible-content {
+    border-top: 1px solid #eef2f7;
+}
+
+/* bloco de suporte */
+.support-contact-box {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.support-contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background-color: #25D366;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.95em;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.support-contact-link:hover {
+    background-color: #1ebe5b;
+    transform: translateY(-1px);
+}
+
+.support-contact-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    object-fit: contain;
+}
+
+/* menu superior fixo */
+.floating-topbar {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    width: calc(100% - 20px);
+    max-width: 900px;
+    transform: translate(-50%, -120%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    background-color: rgba(255, 255, 255, 0.98);
+    border: 1px solid #d8e0ea;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(6px);
+    box-sizing: border-box;
+}
+
+.floating-topbar.show {
+    transform: translate(-50%, 10px);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.floating-topbar-logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.floating-topbar-logo {
+    width: 110px;
+    height: auto;
+    display: block;
+}
+
+.sticky-calculator-selector {
+    position: relative;
+    flex: 1;
+    max-width: 320px;
+    background-color: var(--primary-blue);
+    color: #ffffff;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    box-sizing: border-box;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.sticky-calculator-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.sticky-calculator-dropdown.show {
+    display: block;
+}
+
+.sticky-calculator-dropdown a {
+    display: block;
+    padding: 12px 14px;
+    color: var(--dark-blue);
+    text-decoration: none;
+    font-size: 0.95em;
+    background-color: #ffffff;
+}
+
+.sticky-calculator-dropdown a:hover {
+    background-color: var(--light-gray);
+}
+
+@media (max-width: 768px) {
+    .landing-page.collapsible {
+        padding: 16px 0 0 0;
+    }
+
+    .support-contact-link {
+        width: 100%;
+        justify-content: center;
+        box-sizing: border-box;
+    }
+
+    .floating-topbar {
+        width: calc(100% - 16px);
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .floating-topbar-logo {
+        width: 86px;
+    }
+
+    .sticky-calculator-selector {
+        font-size: 0.95em;
+        padding: 10px;
+        max-width: none;
+    }
+}

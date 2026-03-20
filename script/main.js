@@ -1,41 +1,80 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- NOVO: LÓGICA PARA O MENU DROPDOWN FUNCIONAR EM TODOS OS DISPOSITIVOS ---
+    // --- MENU DROPDOWN PRINCIPAL ---
     const calculatorSelector = document.querySelector('.calculator-selector');
     const calculatorDropdown = document.querySelector('.calculator-dropdown');
 
-    if (calculatorSelector) {
-        // Adiciona um "ouvinte" de clique ao botão do menu
+    if (calculatorSelector && calculatorDropdown) {
         calculatorSelector.addEventListener('click', (event) => {
-            // Impede que o clique se propague e feche o menu imediatamente
-            event.stopPropagation(); 
-            // Adiciona ou remove a classe 'show' para exibir/ocultar o menu
+            event.stopPropagation();
             calculatorDropdown.classList.toggle('show');
         });
     }
 
-    // Fecha o menu se o usuário clicar em qualquer lugar fora dele
-    window.addEventListener('click', (event) => {
-        if (calculatorDropdown && calculatorDropdown.classList.contains('show')) {
-            // Se o alvo do clique NÃO for o menu ou um filho dele, remove a classe 'show'
-            if (!calculatorSelector.contains(event.target)) {
-                calculatorDropdown.classList.remove('show');
+    // --- MENU SUPERIOR FIXO DA HOME ---
+    const floatingTopbar = document.getElementById('floating-topbar');
+    const stickyCalculatorSelector = document.getElementById('sticky-calculator-selector');
+    const stickyCalculatorDropdown = document.getElementById('sticky-calculator-dropdown');
+
+    if (
+        floatingTopbar &&
+        stickyCalculatorSelector &&
+        stickyCalculatorDropdown &&
+        calculatorSelector
+    ) {
+        stickyCalculatorSelector.addEventListener('click', (event) => {
+            event.stopPropagation();
+            stickyCalculatorDropdown.classList.toggle('show');
+        });
+
+        function toggleFloatingTopbar() {
+            const selectorRect = calculatorSelector.getBoundingClientRect();
+            const shouldShowFloatingBar = selectorRect.bottom < 0;
+
+            if (shouldShowFloatingBar) {
+                floatingTopbar.classList.add('show');
+            } else {
+                floatingTopbar.classList.remove('show');
+                stickyCalculatorDropdown.classList.remove('show');
             }
+        }
+
+        window.addEventListener('scroll', toggleFloatingTopbar, { passive: true });
+        window.addEventListener('resize', toggleFloatingTopbar);
+
+        toggleFloatingTopbar();
+    }
+
+    // --- FECHAMENTO DOS MENUS AO CLICAR FORA ---
+    window.addEventListener('click', (event) => {
+        if (
+            calculatorSelector &&
+            calculatorDropdown &&
+            calculatorDropdown.classList.contains('show') &&
+            !calculatorSelector.contains(event.target)
+        ) {
+            calculatorDropdown.classList.remove('show');
+        }
+
+        if (
+            stickyCalculatorSelector &&
+            stickyCalculatorDropdown &&
+            stickyCalculatorDropdown.classList.contains('show') &&
+            !stickyCalculatorSelector.contains(event.target)
+        ) {
+            stickyCalculatorDropdown.classList.remove('show');
         }
     });
 
-    // --- NOVO: LÓGICA PARA O BOTÃO "ADICIONAR À TELA INICIAL" ---
-    
-    let deferredPrompt; // Variável para guardar o evento de instalação
+    // --- BOTÃO "ADICIONAR À TELA INICIAL" ---
+    let deferredPrompt;
     const installButton = document.getElementById('btn-install-app');
 
     window.addEventListener('beforeinstallprompt', (e) => {
-        // Impede que o mini-infobar do Chrome apareça no celular
         e.preventDefault();
-        // Guarda o evento para que ele possa ser disparado mais tarde.
         deferredPrompt = e;
-        // Mostra o nosso botão personalizado
+
         if (installButton) {
-            installButton.style.display = 'block'; // Mostra o botão!
+            installButton.style.display = 'block';
             console.log('`beforeinstallprompt` capturado, botão mostrado.');
         } else {
             console.error('Botão de instalação não encontrado no DOM.');
@@ -46,58 +85,50 @@ document.addEventListener('DOMContentLoaded', () => {
         installButton.addEventListener('click', async () => {
             if (!deferredPrompt) {
                 console.log('Nenhum prompt de instalação disponível.');
-                return; // Se o evento não foi capturado, não faz nada
+                return;
             }
-            
-            // Mostra o prompt de instalação oficial do navegador
+
             deferredPrompt.prompt();
             console.log('Prompt de instalação mostrado.');
-            
-            // Espera o usuário escolher (aceitar ou recusar)
+
             const { outcome } = await deferredPrompt.userChoice;
             console.log(`Escolha do usuário: ${outcome}`);
-            
-            // Não precisamos mais do evento, seja qual for a escolha
+
             deferredPrompt = null;
-            
-            // Esconde o nosso botão, pois ele não pode ser usado duas vezes
             installButton.style.display = 'none';
         });
     }
 
+    // --- BLOCOS COLAPSÁVEIS DA HOME ---
     const collapsibleButtons = document.querySelectorAll('.collapsible-button');
 
     collapsibleButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // Encontra o conteúdo associado a este botão
             const content = button.nextElementSibling;
-            // Encontra o ícone +/-
             const icon = button.querySelector('.toggle-icon');
 
-            // Alterna a classe 'active' no botão
             button.classList.toggle('active');
 
-            // Alterna a exibição do conteúdo
             if (content.classList.contains('show')) {
                 content.classList.remove('show');
-                if (icon) icon.textContent = '+'; // Muda ícone para +
+                if (icon) icon.textContent = '+';
             } else {
                 content.classList.add('show');
-                if (icon) icon.textContent = '-'; // Muda ícone para -
+                if (icon) icon.textContent = '-';
             }
         });
     });
 
-    // Opcional: Ouve se o app foi instalado com sucesso
+    // --- EVENTO DE APP INSTALADO ---
     window.addEventListener('appinstalled', () => {
-      console.log('PWA foi instalado com sucesso!');
-      // Esconde o botão se ele ainda estiver visível por algum motivo
-      if (installButton) {
-          installButton.style.display = 'none';
-      }
-      deferredPrompt = null; 
-    });
+        console.log('PWA foi instalado com sucesso!');
 
+        if (installButton) {
+            installButton.style.display = 'none';
+        }
+
+        deferredPrompt = null;
+    });
 });
 
 // --- REGISTRA O SERVICE WORKER ---
