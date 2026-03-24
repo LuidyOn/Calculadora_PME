@@ -160,7 +160,8 @@
                 <li>As condições comerciais disponíveis informadas nesta proposta estão sujeitas a alteração a qualquer momento e sem aviso prévio.</li>
             </ul>
         </div>
-        <div class="table-wrapper">
+        <div class="table-scroll-hint">Arraste para o lado para ver todas as colunas</div>
+        <div class="table-wrapper" data-scrollable-table>
             <div class="table-container">
                 <table>
                     <thead>
@@ -207,23 +208,37 @@
     <script src="../script/moderfrota.js"></script>
 
     <div id="pdf-modal-overlay" class="modal-overlay">
-    <div class="modal-content">
-        <h2>Informações para o PDF</h2>
-        <p>Por favor, preencha os campos abaixo para gerar o documento.</p>
-        <div class="form-group">
-            <label for="vendedor-name">Seu Nome (Vendedor):</label>
-            <input type="text" id="vendedor-name" placeholder="Digite seu nome completo">
+    <div class="modal-content pdf-modal-content">
+        <div class="pdf-modal-header">
+            <div class="pdf-modal-badge">PDF</div>
+            <h2>Informações para gerar a simulação</h2>
+            <p>Preencha os dados abaixo para personalizar o documento e gerar o código de conferência da proposta.</p>
         </div>
-        <div class="form-group">
-            <label for="cliente-name">Nome do Cliente:</label>
-            <input type="text" id="cliente-name" placeholder="Digite o nome completo do cliente">
+
+        <div class="pdf-modal-grid">
+            <div class="form-group">
+                <label for="vendedor-name">Nome do Vendedor</label>
+                <input type="text" id="vendedor-name" placeholder="Digite o nome completo do vendedor">
+            </div>
+
+            <div class="form-group">
+                <label for="cliente-name">Nome do Cliente</label>
+                <input type="text" id="cliente-name" placeholder="Digite o nome completo do cliente">
+            </div>
+
+            <div class="form-group">
+                <label for="vendedor-cpf-final">3 últimos números do CPF do vendedor</label>
+                <input type="text" id="vendedor-cpf-final" inputmode="numeric" maxlength="3" placeholder="Ex.: 123">
+                <small class="pdf-modal-helper">Use apenas os 3 últimos dígitos, sem pontos ou traço.</small>
+            </div>
         </div>
+
         <div class="modal-actions">
             <button id="btn-cancel-pdf">Cancelar</button>
             <button id="btn-confirm-pdf" class="primary">Confirmar e Gerar PDF</button>
         </div>
     </div>
-    </div>
+</div>
 
 </body>
 </html>

@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         chip.classList.toggle('ready', offlinePronto);
         chip.classList.toggle('pending', !offlinePronto);
-        chipText.textContent = offlinePronto ? 'Offline pronto!' : 'Carregando modo offline...';
+        chipText.textContent = offlinePronto ? 'Offline ativado' : 'Instalando modo offline...';
     }
 
     atualizarChipOfflineHome();

@@ -168,6 +168,56 @@ function configurarMenusDaPagina() {
     });
 }
 
+function configurarIndicacaoRolagemTabela() {
+    const wrapper = document.querySelector('.table-wrapper');
+
+    if (!wrapper) return;
+
+    let nudgeExecutado = false;
+
+    function atualizarEstadoRolagem() {
+        const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+        const mostrarFadeDireito = maxScroll > 4 && wrapper.scrollLeft <= 1;
+
+        wrapper.classList.toggle('show-right-fade', mostrarFadeDireito);
+    }
+
+    function executarNudgeInicial() {
+        if (nudgeExecutado) return;
+        if (window.innerWidth > 768) return;
+
+        const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+        if (maxScroll <= 24) return;
+
+        nudgeExecutado = true;
+
+        setTimeout(() => {
+            wrapper.scrollTo({
+                left: Math.min(48, maxScroll),
+                behavior: 'smooth'
+            });
+
+            setTimeout(() => {
+                wrapper.scrollTo({
+                    left: 0,
+                    behavior: 'smooth'
+                });
+            }, 850);
+        }, 500);
+    }
+
+    wrapper.addEventListener('scroll', atualizarEstadoRolagem, { passive: true });
+
+    window.addEventListener('resize', () => {
+        atualizarEstadoRolagem();
+    });
+
+    requestAnimationFrame(() => {
+        atualizarEstadoRolagem();
+        executarNudgeInicial();
+    });
+}
+
 const camposFormularioStatus = document.querySelectorAll('#loan-form input, #loan-form select');
 camposFormularioStatus.forEach(campo => {
     campo.addEventListener('input', atualizarDisponibilidadePdf);
@@ -265,20 +315,9 @@ camposFormularioStatus.forEach(campo => {
     atualizarResumoInferior();
     atualizarDisponibilidadePdf();
     configurarMenusDaPagina();
+    configurarIndicacaoRolagemTabela();
 
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready
-            .then(() => {
-                atualizarChipOffline();
-            })
-            .catch(() => {
-                atualizarChipOffline();
-            });
-
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            atualizarChipOffline();
-        });
-    }
+    // O chip de offline agora é controlado apenas pela home (main.js)
 
     // LÓGICA ATUALIZADA PARA O FLUXO DE PDF COM MODAL
     // LÓGICA FINAL E COMPLETA PARA O FLUXO DE PDF COM MODAL
@@ -306,17 +345,23 @@ camposFormularioStatus.forEach(campo => {
 
     // O botão de confirmar na janela valida os nomes e chama a função para gerar o PDF
     btnConfirmPdf.addEventListener('click', () => {
-        const vendedorName = document.getElementById('vendedor-name').value;
-        const clienteName = document.getElementById('cliente-name').value;
+        const vendedorName = document.getElementById('vendedor-name').value.trim();
+        const clienteName = document.getElementById('cliente-name').value.trim();
+        const vendedorCpfFinal = document.getElementById('vendedor-cpf-final').value.trim();
 
-        if (!vendedorName || !clienteName) {
-            alert('Por favor, preencha ambos os nomes para continuar.');
+        if (!vendedorName || !clienteName || !vendedorCpfFinal) {
+            alert('Por favor, preencha nome do vendedor, nome do cliente e os 3 últimos números do CPF.');
+            return;
+        }
+
+        if (!/^\d{3}$/.test(vendedorCpfFinal)) {
+            alert('Informe exatamente os 3 últimos números do CPF do vendedor.');
             return;
         }
         
         // Fecha a janela e inicia a geração do PDF
         modalOverlay.classList.remove('show');
-        generatePdf(vendedorName, clienteName);
+        generatePdf(vendedorName, clienteName, vendedorCpfFinal);
     });
 
 
@@ -325,8 +370,29 @@ camposFormularioStatus.forEach(campo => {
      * O bloco try/catch/finally está aqui dentro.
      */
 
+    function contarCaracteresNome(nome) {
+        return (nome || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zA-Z0-9]/g, '')
+            .length;
+    }
+
+    function gerarCodigoSimulacao(dataSimulacao, vendedor, cliente, cpfFinal) {
+        const dia = String(dataSimulacao.getDate()).padStart(2, '0');
+        const mes = String(dataSimulacao.getMonth() + 1).padStart(2, '0');
+        const ano = String(dataSimulacao.getFullYear());
+
+        const totalVendedor = contarCaracteresNome(vendedor);
+        const totalCliente = contarCaracteresNome(cliente);
+        const cpfFinalNumerico = Number(cpfFinal);
+        const somaFinal = totalVendedor + totalCliente + cpfFinalNumerico;
+
+        return `${dia}${mes}${ano}${String(totalVendedor).padStart(2, '0')}${String(totalCliente).padStart(2, '0')}${String(somaFinal).padStart(4, '0')}`;
+    }
+
     // A função de gerar PDF inteira, com as correções
-    async function generatePdf(vendedor, cliente) {
+    async function generatePdf(vendedor, cliente, cpfFinal) {
         const originalElement = document.getElementById('capture');
         const btnGerarPdf = document.getElementById('btn-gerar-pdf');
         const originalButtonText = btnGerarPdf.textContent;
@@ -338,6 +404,9 @@ camposFormularioStatus.forEach(campo => {
         const clone = originalElement.cloneNode(true);
         const clonedActionsDiv = clone.querySelector('.actions');
         if (clonedActionsDiv) clonedActionsDiv.style.display = 'none';
+
+        const elementosParaRemoverDoPdf = clone.querySelectorAll('.header-home-link, .floating-home-link');
+        elementosParaRemoverDoPdf.forEach(elemento => elemento.remove());
 
         // --- CORREÇÃO DA LOGO NO PDF OFFLINE ---
         // Converte a logo original em Base64 para garantir que o html2canvas consiga lê-la
@@ -381,11 +450,16 @@ camposFormularioStatus.forEach(campo => {
         const header = clone.querySelector('header');
         if (header) {
             const infoDiv = document.createElement('div');
+            const dataSimulacao = new Date();
+            const dataSimulacaoTexto = dataSimulacao.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+            const codigoSimulacao = gerarCodigoSimulacao(dataSimulacao, vendedor, cliente, cpfFinal);
+
             infoDiv.className = 'pdf-info';
             infoDiv.innerHTML = `
                 <p><strong>Vendedor:</strong> ${vendedor}</p>
                 <p><strong>Cliente:</strong> ${cliente}</p>
-                <p><strong>Data da Simulação:</strong> ${new Date().toLocaleString('pt-BR', {dateStyle: 'short', timeStyle: 'short'})}</p>
+                <p><strong>Data da Simulação:</strong> ${dataSimulacaoTexto}</p>
+                <p><strong>Código da Simulação:</strong> ${codigoSimulacao}</p>
             `;
             header.appendChild(infoDiv);
         }
