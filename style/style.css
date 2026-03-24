@@ -951,8 +951,8 @@ table td {
 }
 
 .support-contact-icon {
-    width: 20px;
-    height: 20px;
+    width: 40px;
+    height: 40px;
     display: block;
     object-fit: contain;
 }
@@ -1072,5 +1072,358 @@ table td {
         font-size: 0.95em;
         padding: 10px;
         max-width: none;
+    }
+}
+
+/* ========================================================== */
+/* === BARRA INFERIOR FIXA DAS CALCULADORAS ================= */
+/* ========================================================== */
+
+.has-bottom-bar {
+    padding-bottom: 120px;
+}
+
+.bottom-action-bar {
+    position: fixed;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    width: calc(100% - 20px);
+    max-width: 860px;
+    margin: 0;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid #d8e0ea;
+    border-radius: 14px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+    backdrop-filter: blur(8px);
+    z-index: 950;
+    box-sizing: border-box;
+}
+
+.bottom-action-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.offline-status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.offline-status-chip.ready {
+    background-color: rgba(37, 211, 102, 0.12);
+    color: #157347;
+    border: 1px solid rgba(37, 211, 102, 0.28);
+}
+
+.offline-status-chip.pending {
+    background-color: rgba(255, 193, 7, 0.14);
+    color: #8a6700;
+    border: 1px solid rgba(255, 193, 7, 0.32);
+}
+
+.offline-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
+    flex-shrink: 0;
+}
+
+.bottom-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    font-size: 13px;
+    color: #3b3b3b;
+}
+
+.bottom-summary-item strong {
+    color: var(--dark-blue);
+}
+
+.bottom-action-bar #btn-gerar-pdf {
+    margin: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .has-bottom-bar {
+        padding-bottom: 150px;
+    }
+
+    .bottom-action-bar {
+        width: calc(100% - 16px);
+        padding: 10px 12px;
+        gap: 10px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .bottom-action-meta {
+        width: 100%;
+    }
+
+    .bottom-summary {
+        font-size: 12px;
+        gap: 8px 12px;
+    }
+
+    .bottom-action-bar #btn-gerar-pdf {
+        width: 100%;
+    }
+}
+
+/* ========================================================== */
+/* === CHIP DE STATUS / TOPO FIXO / BARRA INFERIOR ========= */
+/* ========================================================== */
+
+.collapsible-button-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.collapsible-button-main h2 {
+    margin: 0;
+}
+
+.offline-status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.offline-status-chip.ready {
+    background-color: rgba(37, 211, 102, 0.12);
+    color: #157347;
+    border: 1px solid rgba(37, 211, 102, 0.28);
+}
+
+.offline-status-chip.pending {
+    background-color: rgba(255, 193, 7, 0.14);
+    color: #8a6700;
+    border: 1px solid rgba(255, 193, 7, 0.32);
+}
+
+.offline-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
+    flex-shrink: 0;
+}
+
+/* Topbar fixa das páginas de simulação */
+.simulator-floating-topbar {
+    max-width: 900px;
+}
+
+.floating-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.floating-home-link {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-blue);
+    background-color: #eef5ff;
+    border: 1px solid #cfe0f3;
+    border-radius: 10px;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.floating-home-link:hover {
+    background-color: #e1eeff;
+    transform: translateY(-1px);
+}
+
+.floating-home-link svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+/* Barra inferior fixa das calculadoras */
+.has-bottom-bar {
+    padding-bottom: 132px;
+}
+
+.bottom-action-bar {
+    position: fixed;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    width: calc(100% - 20px);
+    max-width: 860px;
+    margin: 0;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid #d8e0ea;
+    border-radius: 14px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+    backdrop-filter: blur(8px);
+    z-index: 950;
+    box-sizing: border-box;
+}
+
+.bottom-action-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.bottom-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    font-size: 13px;
+    color: #3b3b3b;
+}
+
+.bottom-summary-item strong {
+    color: var(--dark-blue);
+}
+
+.bottom-action-bar #btn-gerar-pdf {
+    margin: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.bottom-action-bar #btn-gerar-pdf:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+@media (max-width: 768px) {
+    .floating-topbar-left {
+        gap: 8px;
+    }
+
+    .floating-home-link {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+    }
+
+    .has-bottom-bar {
+        padding-bottom: 160px;
+    }
+
+    .bottom-action-bar {
+        width: calc(100% - 16px);
+        padding: 10px 12px;
+        gap: 10px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .bottom-action-meta {
+        width: 100%;
+    }
+
+    .bottom-summary {
+        font-size: 12px;
+        gap: 8px 12px;
+    }
+
+    .bottom-action-bar #btn-gerar-pdf {
+        width: 100%;
+    }
+}
+
+/* ========================================================== */
+/* === CASINHA AO LADO DO BOTÃO AZUL NO TOPO ================ */
+/* ========================================================== */
+
+.calculator-selector-row {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+}
+
+.calculator-selector-row .calculator-selector {
+    flex: 1;
+}
+
+.header-home-link {
+    width: 48px;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-blue);
+    color: #ffffff;
+    border-radius: 8px;
+    text-decoration: none;
+    box-sizing: border-box;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.header-home-link:hover {
+    background-color: var(--dark-blue);
+    transform: translateY(-1px);
+    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.header-home-link svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .calculator-selector-row {
+        gap: 8px;
+    }
+
+    .header-home-link {
+        width: 44px;
+        min-width: 44px;
+    }
+
+    .header-home-link svg {
+        width: 20px;
+        height: 20px;
     }
 }

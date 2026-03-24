@@ -8,19 +8,48 @@
     <link rel="manifest" href="/Calculadora_PME/manifest.json">
 </head>
 <body>
-    <div id="capture" class="simulator-container">
+    <div id="floating-topbar" class="floating-topbar simulator-floating-topbar">
+        <div class="floating-topbar-left">
+            
+            <a href="../index.html" class="floating-home-link" aria-label="Voltar para a página inicial">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="M12 3.2 3 10.4V21h6v-5.5h6V21h6v-10.6L12 3.2z"/>
+                </svg>
+            </a>
+        </div>
+
+        <div class="sticky-calculator-selector" id="sticky-calculator-selector">
+            <span>Simulador Moderfrota</span> &#9662;
+            <div class="sticky-calculator-dropdown" id="sticky-calculator-dropdown">
+                <a href="../index.html">Página Inicial</a>
+                <a href="pronaf.html">Simulador AG: Pronaf</a>
+                <a href="moderfrota.html">Simulador Moderfrota</a>
+                <a href="tfbd.html">Simulador TFBD Rural</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="capture" class="simulator-container has-bottom-bar">
         <header>
             <div class="logo">
                 <span class="logo-main">Simulação de Financiamento</span>
                 <img src="../logos/LOGO_AMARELA.png" alt="Logo PME" class="logo-image">
             </div>
-            <div class="calculator-selector">
-                <span id="current-calculator">Simulador Moderfrota</span> &#9662;
-                <div class="calculator-dropdown">
-                    <a href="../index.html">Página Inicial</a>
-                    <a href="pronaf.html">Simulador AG: Pronaf</a>
-                    <a href="moderfrota.html">Simulador Moderfrota</a>
-                    <a href="tfbd.html">Simulador TFBD Rural</a>
+            <div class="calculator-selector-row">
+                <a href="../index.html" class="header-home-link" aria-label="Voltar para a página inicial">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="currentColor" d="M12 3.2 3 10.4V21h6v-5.5h6V21h6v-10.6L12 3.2z"/>
+                    </svg>
+                </a>
+
+                <div class="calculator-selector">
+                    <span id="current-calculator">Simulador Moderfrota</span> &#9662;
+                    <div class="calculator-dropdown">
+                        <a href="../index.html">Página Inicial</a>
+                        <a href="pronaf.html">Simulador AG: Pronaf</a>
+                        <a href="moderfrota.html">Simulador Moderfrota</a>
+                        <a href="tfbd.html">Simulador TFBD Rural</a>
+                    </div>
                 </div>
             </div>
         </header>
@@ -156,12 +185,25 @@
                 </table>
             </div>
         </div>
-        <div class="actions">
-            <button id="btn-gerar-pdf">Gerar PDF</button>
+<div class="actions bottom-action-bar">
+    <div class="bottom-action-meta">
+        <div id="pdf-status-chip" class="offline-status-chip pending">
+            <span class="offline-status-dot"></span>
+            <span id="pdf-status-text">Preencha os campos obrigatórios</span>
+        </div>
+
+        <div class="bottom-summary">
+            <span class="bottom-summary-item">Parcelas: <strong id="footer-num-parcelas">0</strong></span>
+            <span class="bottom-summary-item">Financiado: <strong id="footer-valor-financiado">R$ 0,00</strong></span>
+            <span class="bottom-summary-item">Total: <strong id="footer-total-geral">R$ 0,00</strong></span>
         </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <button id="btn-gerar-pdf">Gerar PDF</button>
+</div>
+    </div>
+    <script src="../vendor/html2canvas.min.js"></script>
+    <script src="../vendor/jspdf.umd.min.js"></script>
     <script src="../script/moderfrota.js"></script>
 
     <div id="pdf-modal-overlay" class="modal-overlay">

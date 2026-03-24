@@ -75,25 +75,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (installButton) {
             installButton.style.display = 'block';
-            console.log('`beforeinstallprompt` capturado, botão mostrado.');
-        } else {
-            console.error('Botão de instalação não encontrado no DOM.');
         }
     });
 
     if (installButton) {
         installButton.addEventListener('click', async () => {
             if (!deferredPrompt) {
-                console.log('Nenhum prompt de instalação disponível.');
                 return;
             }
 
             deferredPrompt.prompt();
-            console.log('Prompt de instalação mostrado.');
-
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`Escolha do usuário: ${outcome}`);
-
+            await deferredPrompt.userChoice;
             deferredPrompt = null;
             installButton.style.display = 'none';
         });
@@ -119,15 +111,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- CHIP DE OFFLINE DA HOME ---
+    function atualizarChipOfflineHome() {
+        const chip = document.getElementById('home-offline-status-chip');
+        const chipText = document.getElementById('home-offline-status-text');
+
+        if (!chip || !chipText) return;
+
+        if (!('serviceWorker' in navigator)) {
+            chip.classList.remove('ready', 'pending');
+            chipText.textContent = 'Offline indisponível';
+            return;
+        }
+
+        const offlinePronto = !!navigator.serviceWorker.controller;
+
+        chip.classList.toggle('ready', offlinePronto);
+        chip.classList.toggle('pending', !offlinePronto);
+        chipText.textContent = offlinePronto ? 'Offline pronto!' : 'Carregando modo offline...';
+    }
+
+    atualizarChipOfflineHome();
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready
+            .then(() => {
+                atualizarChipOfflineHome();
+            })
+            .catch(() => {
+                atualizarChipOfflineHome();
+            });
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            atualizarChipOfflineHome();
+        });
+    }
+
     // --- EVENTO DE APP INSTALADO ---
     window.addEventListener('appinstalled', () => {
-        console.log('PWA foi instalado com sucesso!');
-
         if (installButton) {
             installButton.style.display = 'none';
         }
 
         deferredPrompt = null;
+        atualizarChipOfflineHome();
     });
 });
 

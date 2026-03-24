@@ -35,6 +35,120 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatCurrency = (value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     const formatDate = (date) => isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
 
+    function atualizarResumoInferior() {
+        const footerNumParcelas = document.getElementById('footer-num-parcelas');
+        const footerValorFinanciado = document.getElementById('footer-valor-financiado');
+        const footerTotalGeral = document.getElementById('footer-total-geral');
+        const parcelasInput = document.getElementById('parcelas');
+        const valorFinanciadoInput = document.getElementById('valorFinanciado');
+        const totalGeralCell = document.getElementById('total-geral');
+
+        if (footerNumParcelas && parcelasInput) {
+            footerNumParcelas.textContent = parcelasInput.value || '0';
+        }
+
+        if (footerValorFinanciado && valorFinanciadoInput) {
+            footerValorFinanciado.textContent = valorFinanciadoInput.value || 'R$ 0,00';
+        }
+
+        if (footerTotalGeral && totalGeralCell) {
+            footerTotalGeral.textContent = totalGeralCell.textContent || 'R$ 0,00';
+        }
+    }
+
+    function camposObrigatoriosPreenchidos() {
+        const campos = Array.from(document.querySelectorAll('#loan-form input, #loan-form select'))
+            .filter(campo => !campo.readOnly && !campo.disabled && campo.type !== 'button' && campo.type !== 'submit');
+
+        return campos.every(campo => String(campo.value).trim() !== '');
+    }
+
+    function atualizarDisponibilidadePdf() {
+        const chip = document.getElementById('pdf-status-chip');
+        const chipText = document.getElementById('pdf-status-text');
+        const btnGerarPdf = document.getElementById('btn-gerar-pdf');
+        const disponivel = camposObrigatoriosPreenchidos();
+
+        if (chip && chipText) {
+            chip.classList.toggle('ready', disponivel);
+            chip.classList.toggle('pending', !disponivel);
+            chipText.textContent = disponivel ? 'PDF disponível' : 'Preencha os campos obrigatórios';
+        }
+
+        if (btnGerarPdf) {
+            btnGerarPdf.disabled = !disponivel;
+        }
+    }
+
+    function configurarMenusDaPagina() {
+        const calculatorSelector = document.querySelector('.calculator-selector');
+        const calculatorDropdown = document.querySelector('.calculator-dropdown');
+        const floatingTopbar = document.getElementById('floating-topbar');
+        const stickyCalculatorSelector = document.getElementById('sticky-calculator-selector');
+        const stickyCalculatorDropdown = document.getElementById('sticky-calculator-dropdown');
+
+        if (calculatorSelector && calculatorDropdown) {
+            calculatorSelector.addEventListener('click', (event) => {
+                event.stopPropagation();
+                calculatorDropdown.classList.toggle('show');
+            });
+        }
+
+        if (
+            floatingTopbar &&
+            stickyCalculatorSelector &&
+            stickyCalculatorDropdown &&
+            calculatorSelector
+        ) {
+            stickyCalculatorSelector.addEventListener('click', (event) => {
+                event.stopPropagation();
+                stickyCalculatorDropdown.classList.toggle('show');
+            });
+
+            function toggleFloatingTopbar() {
+                const selectorRect = calculatorSelector.getBoundingClientRect();
+                const shouldShowFloatingBar = selectorRect.bottom < 0;
+
+                if (shouldShowFloatingBar) {
+                    floatingTopbar.classList.add('show');
+                } else {
+                    floatingTopbar.classList.remove('show');
+                    stickyCalculatorDropdown.classList.remove('show');
+                }
+            }
+
+            window.addEventListener('scroll', toggleFloatingTopbar, { passive: true });
+            window.addEventListener('resize', toggleFloatingTopbar);
+            toggleFloatingTopbar();
+        }
+
+        window.addEventListener('click', (event) => {
+            if (
+                calculatorDropdown &&
+                calculatorDropdown.classList.contains('show') &&
+                calculatorSelector &&
+                !calculatorSelector.contains(event.target)
+            ) {
+                calculatorDropdown.classList.remove('show');
+            }
+
+            if (
+                stickyCalculatorDropdown &&
+                stickyCalculatorDropdown.classList.contains('show') &&
+                stickyCalculatorSelector &&
+                !stickyCalculatorSelector.contains(event.target)
+            ) {
+                stickyCalculatorDropdown.classList.remove('show');
+            }
+        });
+    }
+
+    const camposFormularioStatus = document.querySelectorAll('#loan-form input, #loan-form select');
+    camposFormularioStatus.forEach(campo => {
+        campo.addEventListener('input', atualizarDisponibilidadePdf);
+        campo.addEventListener('change', atualizarDisponibilidadePdf);
+    });
+
     // --- LÓGICA DE DIAS ÚTEIS E CARÊNCIA (sempre necessárias) ---
     const feriadosNacionais = [ "2025-01-01", "2025-03-03", "2025-03-04", "2025-04-18", "2025-04-21", "2025-05-01", "2025-06-19", "2025-09-07", "2025-10-12", "2025-11-02", "2025-11-15", "2025-11-20", "2025-12-25", "2026-01-01", "2026-04-03", "2026-04-21", "2026-05-01", "2026-06-04", "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25" ];
     function isDiaUtil(date) { const diaDaSemana = date.getDay(); if (diaDaSemana === 0 || diaDaSemana === 6) return false; const dataFormatada = date.toISOString().slice(0, 10); if (feriadosNacionais.includes(dataFormatada)) return false; return true; }
@@ -106,7 +220,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const tbody = document.getElementById('amortization-body');
         tbody.innerHTML = '';
-        if (numParcelas <= 0 || valorFinanciado <= 0) return;
+        if (numParcelas <= 0 || valorFinanciado <= 0) {
+        document.getElementById('total-juros').textContent = formatCurrency(0);
+        document.getElementById('total-principal').textContent = formatCurrency(0);
+        document.getElementById('total-geral').textContent = formatCurrency(0);
+        atualizarResumoInferior();
+        atualizarDisponibilidadePdf();
+        return;
+    }
 
         let saldoDevedor = valorFinanciado;
         let totalJuros = 0;
@@ -150,12 +271,31 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('total-juros').textContent = formatCurrency(totalJuros);
         document.getElementById('total-principal').textContent = formatCurrency(valorFinanciado);
         document.getElementById('total-geral').textContent = formatCurrency(valorFinanciado + totalJuros);
+        atualizarResumoInferior();
+        atualizarDisponibilidadePdf();
     }
 
     setInitialDate();
     setDefaultVencimento();
     formatarValor(valorBemInput);
     calcularTudo();
+    atualizarResumoInferior();
+    atualizarDisponibilidadePdf();
+    configurarMenusDaPagina();
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready
+            .then(() => {
+                atualizarChipOffline();
+            })
+            .catch(() => {
+                atualizarChipOffline();
+            });
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            atualizarChipOffline();
+        });
+    }
 
     // LÓGICA ATUALIZADA PARA O FLUXO DE PDF COM MODAL
     // LÓGICA FINAL E COMPLETA PARA O FLUXO DE PDF COM MODAL
@@ -369,30 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    
-    // Lógica do menu dropdown (igual à dos outros scripts)
-    // --- NOVO: LÓGICA PARA O MENU DROPDOWN FUNCIONAR EM TODOS OS DISPOSITIVOS ---
-    const calculatorSelector = document.querySelector('.calculator-selector');
-    const calculatorDropdown = document.querySelector('.calculator-dropdown');
-
-    if (calculatorSelector) {
-    calculatorSelector.addEventListener('click', (event) => {
-        // Impede que o clique no botão feche o menu imediatamente (ver listener do window)
-        event.stopPropagation(); 
-        // Adiciona ou remove a classe 'show' para exibir/ocultar o menu
-        calculatorDropdown.classList.toggle('show');
-    });
-    }
-
-    // Opcional, mas recomendado: Fecha o menu se o usuário clicar fora dele
-    window.addEventListener('click', (event) => {
-        if (calculatorDropdown && calculatorDropdown.classList.contains('show')) {
-            // Se o clique não foi dentro do seletor, fecha o menu
-            if (!calculatorSelector.contains(event.target)) {
-                calculatorDropdown.classList.remove('show');
-            }
-        }
-    });
+    // Menu da página já configurado acima
 });
 
 // --- REGISTRA O SERVICE WORKER ---

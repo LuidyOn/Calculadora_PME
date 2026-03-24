@@ -2,22 +2,28 @@
 
 const CACHE_NAME = 'simulador-financeiro-cache-v2.0.3'; // !!!!!!!!SEMPRE ATUALIZE A VERSÃO AQUI E NO INDEX ANTES DE SUBIR A APLICAÇÃO COM MUDANÇAS!!!!!!!!!
 const urlsToCache = [
-  '/Calculadora_PME/',                     // <<< Caminho raiz do projeto
+  '/Calculadora_PME/',
   '/Calculadora_PME/index.html',
   '/Calculadora_PME/manifest.json',
   '/Calculadora_PME/style/style.css',
+
   '/Calculadora_PME/script/main.js',
   '/Calculadora_PME/script/pronaf.js',
   '/Calculadora_PME/script/moderfrota.js',
   '/Calculadora_PME/script/tfbd.js',
+
   '/Calculadora_PME/HTMLs/pronaf.html',
   '/Calculadora_PME/HTMLs/moderfrota.html',
   '/Calculadora_PME/HTMLs/tfbd.html',
+
+  '/Calculadora_PME/vendor/html2canvas.min.js',
+  '/Calculadora_PME/vendor/jspdf.umd.min.js',
+
   '/Calculadora_PME/icons/logo_newholland_192px.jpg',
   '/Calculadora_PME/icons/logo_newholland_512px.jpg',
-  '/Calculadora_PME/icons/whatsapp.png',
   '/Calculadora_PME/logos/LOGO_AMARELA.png',
   '/Calculadora_PME/img/banner-home.jpg',
+  '/Calculadora_PME/icons/whatsapp.png',
 ];
 
 // --- Evento 'install' ---
