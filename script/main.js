@@ -1,12 +1,56 @@
 document.addEventListener('DOMContentLoaded', () => {
+    function configurarSubgruposMenu(dropdownElement) {
+        if (!dropdownElement) return;
+
+        const toggles = dropdownElement.querySelectorAll('.menu-group-toggle');
+
+        function fecharTodos() {
+            dropdownElement.querySelectorAll('.menu-group-toggle').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-expanded', 'false');
+            });
+
+            dropdownElement.querySelectorAll('.menu-group-content').forEach(content => {
+                content.classList.remove('show');
+            });
+        }
+
+        toggles.forEach(toggle => {
+            toggle.setAttribute('aria-expanded', 'false');
+
+            toggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+
+                const content = toggle.nextElementSibling;
+                const estavaAberto = content && content.classList.contains('show');
+
+                fecharTodos();
+
+                if (!estavaAberto && content) {
+                    toggle.classList.add('active');
+                    toggle.setAttribute('aria-expanded', 'true');
+                    content.classList.add('show');
+                }
+            });
+        });
+
+        dropdownElement._fecharSubgrupos = fecharTodos;
+    }
+
     // --- MENU DROPDOWN PRINCIPAL ---
     const calculatorSelector = document.querySelector('.calculator-selector');
     const calculatorDropdown = document.querySelector('.calculator-dropdown');
 
     if (calculatorSelector && calculatorDropdown) {
+        configurarSubgruposMenu(calculatorDropdown);
+
         calculatorSelector.addEventListener('click', (event) => {
             event.stopPropagation();
             calculatorDropdown.classList.toggle('show');
+
+            if (!calculatorDropdown.classList.contains('show') && calculatorDropdown._fecharSubgrupos) {
+                calculatorDropdown._fecharSubgrupos();
+            }
         });
     }
 
@@ -21,9 +65,15 @@ document.addEventListener('DOMContentLoaded', () => {
         stickyCalculatorDropdown &&
         calculatorSelector
     ) {
+        configurarSubgruposMenu(stickyCalculatorDropdown);
+
         stickyCalculatorSelector.addEventListener('click', (event) => {
             event.stopPropagation();
             stickyCalculatorDropdown.classList.toggle('show');
+
+            if (!stickyCalculatorDropdown.classList.contains('show') && stickyCalculatorDropdown._fecharSubgrupos) {
+                stickyCalculatorDropdown._fecharSubgrupos();
+            }
         });
 
         function toggleFloatingTopbar() {
@@ -35,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 floatingTopbar.classList.remove('show');
                 stickyCalculatorDropdown.classList.remove('show');
+                if (stickyCalculatorDropdown._fecharSubgrupos) stickyCalculatorDropdown._fecharSubgrupos();
             }
         }
 
@@ -53,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             !calculatorSelector.contains(event.target)
         ) {
             calculatorDropdown.classList.remove('show');
+            if (calculatorDropdown._fecharSubgrupos) calculatorDropdown._fecharSubgrupos();
         }
 
         if (
@@ -62,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             !stickyCalculatorSelector.contains(event.target)
         ) {
             stickyCalculatorDropdown.classList.remove('show');
+            if (stickyCalculatorDropdown._fecharSubgrupos) stickyCalculatorDropdown._fecharSubgrupos();
         }
     });
 
@@ -147,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- EVENTO DE APP INSTALADO ---
     window.addEventListener('appinstalled', () => {
         if (installButton) {
             installButton.style.display = 'none';

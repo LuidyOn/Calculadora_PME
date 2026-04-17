@@ -3,63 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Moderfrota</title>
-    <link rel="stylesheet" href="../style/style.css">
+    <title>Simulador Pronaf</title>
+    <link rel="stylesheet" href="../../style/style.css">
     <link rel="manifest" href="/Calculadora_PME/manifest.json">
 </head>
 <body>
     <div id="floating-topbar" class="floating-topbar simulator-floating-topbar">
-        <div class="floating-topbar-left">
-            
-            <a href="../index.html" class="floating-home-link" aria-label="Voltar para a página inicial">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="currentColor" d="M12 3.2 3 10.4V21h6v-5.5h6V21h6v-10.6L12 3.2z"/>
-                </svg>
-            </a>
-        </div>
+            <div class="floating-topbar-left">
+                <a href="../../index.html" class="floating-home-link" aria-label="Voltar para a página inicial">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="currentColor" d="M12 3.2 3 10.4V21h6v-5.5h6V21h6v-10.6L12 3.2z"/>
+                    </svg>
+                </a>
+            </div>
 
-        <div class="sticky-calculator-selector" id="sticky-calculator-selector">
-            <span>Simulador Moderfrota</span> &#9662;
-            <div class="sticky-calculator-dropdown" id="sticky-calculator-dropdown">
-                <a href="../index.html">Página Inicial</a>
-                <a href="pronaf.html">Simulador AG: Pronaf</a>
-                <a href="moderfrota.html">Simulador Moderfrota</a>
-                <a href="tfbd.html">Simulador TFBD Rural</a>
+            <div class="sticky-calculator-selector" id="sticky-calculator-selector">
+                <span>Simulador AG: Pronaf</span> &#9662;
+                <div class="sticky-calculator-dropdown menu-groups" id="sticky-calculator-dropdown">
+                    <button type="button" class="menu-group-toggle">
+                        <span>Agrícola</span>
+                        <span class="menu-group-arrow">▾</span>
+                    </button>
+                    <div class="menu-group-content">
+                        <a href="pronaf.html">Simulador AG: Pronaf</a>
+                        <a href="moderfrota.html">Simulador Moderfrota</a>
+                        <a href="tfbd.html">Simulador TFBD Rural</a>
+                    </div>
+
+                    <button type="button" class="menu-group-toggle construction">
+                        <span class="menu-group-label-row">
+                            <span class="menu-group-label-text">Construção</span>
+                            <span class="menu-group-mini-banner menu-group-mini-banner-construcao">Linhas CE</span>
+                        </span>
+                        <span class="menu-group-arrow">▾</span>
+                    </button>
+                    <div class="menu-group-content">
+                        <a href="../construcao/cdc-ce.html">CDC Construção</a>
+                        <a href="../construcao/mais-inovacao-ce.html">Finame + Inovação</a>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
     <div id="capture" class="simulator-container has-bottom-bar">
         <header>
             <div class="logo">
                 <span class="logo-main">Simulação de Financiamento</span>
-                <img src="../logos/LOGO_AMARELA.png" alt="Logo PME" class="logo-image">
+                <img src="../../logos/LOGO_AMARELA.png" alt="Logo PME" class="logo-image">
             </div>
             <div class="calculator-selector-row">
-                <a href="../index.html" class="header-home-link" aria-label="Voltar para a página inicial">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path fill="currentColor" d="M12 3.2 3 10.4V21h6v-5.5h6V21h6v-10.6L12 3.2z"/>
-                    </svg>
-                </a>
+    <a href="../../index.html" class="header-home-link" aria-label="Voltar para a página inicial">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M12 3.2 3 10.4V21h6v-5.5h6V21h6v-10.6L12 3.2z"/>
+        </svg>
+    </a>
 
-                <div class="calculator-selector">
-                    <span id="current-calculator">Simulador Moderfrota</span> &#9662;
-                    <div class="calculator-dropdown">
-                        <a href="../index.html">Página Inicial</a>
-                        <a href="pronaf.html">Simulador AG: Pronaf</a>
-                        <a href="moderfrota.html">Simulador Moderfrota</a>
-                        <a href="tfbd.html">Simulador TFBD Rural</a>
-                    </div>
-                </div>
+    <div class="calculator-selector">
+        <span id="current-calculator">Simulador AG: Pronaf</span> &#9662;
+        <div class="calculator-dropdown menu-groups">
+            <button type="button" class="menu-group-toggle">
+                <span>Agrícola</span>
+                <span class="menu-group-arrow">▾</span>
+            </button>
+            <div class="menu-group-content">
+                <a href="pronaf.html">Simulador AG: Pronaf</a>
+                <a href="moderfrota.html">Simulador Moderfrota</a>
+                <a href="tfbd.html">Simulador TFBD Rural</a>
             </div>
+
+            <button type="button" class="menu-group-toggle construction">
+                <span>Construção</span>
+                <span class="menu-group-arrow">▾</span>
+            </button>
+            <div class="menu-group-content">
+                <a href="../construcao/cdc-ce.html">CDC Construção</a>
+                <a href="../construcao/mais-inovacao-ce.html">Finame + Inovação</a>
+            </div>
+        </div>
+    </div>
+</div>
         </header>
 
         <form id="loan-form">
             <div class="form-grid">
                 <div class="form-column">
                     <div class="form-group">
-                        <label for="tipoFinanciamento">TIPO DE FINANCIAMENTO:</label>
-                        <select id="tipoFinanciamento">
+                        <label for="tipoPessoa">TIPO PESSOA:</label>
+                        <select id="tipoPessoa">
                             <option value="PF" selected>PF</option>
                             <option value="PJ">PJ</option>
                         </select>
@@ -70,10 +100,7 @@
                     </div>
                     <div class="form-group">
                         <label for="produto">PRODUTO:</label>
-                        <select id="produto">
-                            <option value="MODERFROTA NOVOS" selected>MODERFROTA NOVOS</option>
-                            <option value="MODERFROTA USADOS">MODERFROTA USADOS</option>
-                        </select>
+                        <input type="text" id="produto" value="PRONAF" readonly>
                     </div>
                     <div class="form-group">
                         <label for="empresa">EMPRESA:</label>
@@ -84,7 +111,7 @@
                     </div>
                     <div class="form-group">
                         <label for="valorBem">VALOR DO BEM:</label>
-                        <input type="text" id="valorBem" value="1.000.000,00" inputmode="numeric">
+                        <input type="text" id="valorBem" value="100.000,00" inputmode="numeric">
                     </div>
                     <div class="form-group">
                         <label for="percEntrada">PORCENTAGEM DE ENTRADA:</label>
@@ -100,16 +127,12 @@
                         <label for="valorFinanciado">VALOR FINANCIADO:</label>
                         <input type="text" id="valorFinanciado" readonly>
                     </div>
+                    <div class="form-group read-only">
+                        <label for="iof">IOF:</label>
+                        <input type="text" id="iof" value="-" readonly> 
+                    </div>
                 </div>
                 <div class="form-column">
-                    <div class="form-group read-only">
-                        <label for="segmentoCliente">SEGMENTO DO CLIENTE:</label>
-                        <input type="text" id="segmentoCliente" value="RURAL" readonly>
-                    </div>
-                    <div class="form-group read-only">
-                        <label for="segmento">SEGMENTO:</label>
-                        <input type="text" id="segmento" value="AG" readonly>
-                    </div>
                     <div class="form-group">
                         <label for="periodicidade">PERIODICIDADE:</label>
                         <select id="periodicidade">
@@ -121,21 +144,17 @@
                         <label for="parcelas">PARCELAS:</label>
                         <input type="number" id="parcelas" value="7">
                     </div>
-                    <div class="form-group read-only">
-                        <label for="parcelasPrincipal">PARCELAS DE PRINCIPAL:</label>
-                        <input type="text" id="parcelasPrincipal" readonly>
-                    </div>
                     <div class="form-group">
                         <label for="taxaAA">TAXA (A.A%):</label>
-                        <input type="number" id="taxaAA" value="13.50" step="0.1">
+                        <input type="number" id="taxaAA" value="5.00" step="0.1">
                     </div>
                     <div class="form-group read-only">
                         <label for="cetAA">CET (a.a.%):</label> 
                         <input type="text" id="cetAA" readonly> 
                     </div>
                     <div class="form-group read-only">
-                        <label for="cetAM">CET (A.M.%):</label>
-                        <input type="text" id="cetAM" readonly>
+                        <label for="parcelasPrincipal">PARCELAS DE PRINCIPAL:</label>
+                        <input type="text" id="parcelasPrincipal" readonly>
                     </div>
                 </div>
             </div>
@@ -146,6 +165,7 @@
                 </div>
                 <div class="form-group-inline">
                     <label>CARÊNCIA (EM MESES)</label>
+                    <span>Até 14 meses</span>
                     <input type="number" id="carencia" readonly>
                 </div>
             </div>
@@ -203,9 +223,9 @@
     <button id="btn-gerar-pdf">Gerar PDF</button>
 </div>
     </div>
-    <script src="../vendor/html2canvas.min.js"></script>
-    <script src="../vendor/jspdf.umd.min.js"></script>
-    <script src="../script/moderfrota.js"></script>
+    <script src="../../vendor/html2canvas.min.js"></script>
+    <script src="../../vendor/jspdf.umd.min.js"></script>
+    <script src="../../script/agriculas/pronaf.js"></script>
 
     <div id="pdf-modal-overlay" class="modal-overlay">
     <div class="modal-content pdf-modal-content">

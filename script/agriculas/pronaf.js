@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         liberacaoInput.value = `${yyyy}-${mm}-${dd}`;
     }
 
-    function setDefaultVencimento() {
+        function setDefaultVencimento() {
         const vencimentoInput = document.getElementById('primeiroVencimento');
         const today = new Date();
         today.setMonth(today.getMonth() + 12);
@@ -30,20 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     valorBemInput.addEventListener('input', () => formatarValor(valorBemInput));
 
-    // --- NOVO: TRAVA DE 15% PARA MODERFROTA ---
-    const percEntradaInput = document.getElementById('percEntrada');
-    if (percEntradaInput) {
-        percEntradaInput.value = 15;
-    }
-    percEntradaInput.addEventListener('change', () => {
-        let valor = parseFloat(percEntradaInput.value) || 0;
-        if (valor < 15) {
-            alert("Para Moderfrota, a entrada mínima obrigatória é de 15%.");
-            percEntradaInput.value = 15;
-            calcularTudo(); // Força o recálculo
-        }
-    });
-
     // Funções e lista de feriados para cálculo de dias úteis
     const feriadosNacionais = [ "2025-01-01", "2025-03-03", "2025-03-04", "2025-04-18", "2025-04-21", "2025-05-01", "2025-06-19", "2025-09-07", "2025-10-12", "2025-11-02", "2025-11-15", "2025-11-20", "2025-12-25", "2026-01-01", "2026-04-03", "2026-04-21", "2026-05-01", "2026-06-04", "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25" ];
     function isDiaUtil(date) { const diaDaSemana = date.getDay(); if (diaDaSemana === 0 || diaDaSemana === 6) return false; const dataFormatada = date.toISOString().slice(0, 10); if (feriadosNacionais.includes(dataFormatada)) return false; return true; }
@@ -54,68 +40,114 @@ document.addEventListener('DOMContentLoaded', () => {
         const liberacaoInput = document.getElementById('liberacao'); const vencimentoInput = document.getElementById('primeiroVencimento'); const carenciaInput = document.getElementById('carencia'); const dataLiberacao = new Date(liberacaoInput.value + 'T00:00:00'); const dataPrimeiroVencimento = new Date(vencimentoInput.value + 'T00:00:00'); if (isNaN(dataLiberacao.getTime()) || isNaN(dataPrimeiroVencimento.getTime())) { carenciaInput.value = 0; return; } const mesesDiferenca = (dataPrimeiroVencimento.getFullYear() - dataLiberacao.getFullYear()) * 12 + (dataPrimeiroVencimento.getMonth() - dataLiberacao.getMonth()); carenciaInput.value = mesesDiferenca; if (mesesDiferenca > 14) { alert("A carência não pode exceder 14 meses. A data do primeiro vencimento será ajustada."); let dataMaxima = new Date(dataLiberacao); dataMaxima.setMonth(dataMaxima.getMonth() + 14); const yyyy = dataMaxima.getFullYear(); const mm = String(dataMaxima.getMonth() + 1).padStart(2, '0'); const dd = String(dataMaxima.getDate()).padStart(2, '0'); vencimentoInput.value = `${yyyy}-${mm}-${dd}`; carenciaInput.value = 14; vencimentoInput.dispatchEvent(new Event('input')); }
     }
 
+    // Adiciona "ouvintes" a todos os campos que devem recalcular o simulador
     const inputs = document.querySelectorAll('#valorBem, #percEntrada, #parcelas, #taxaAA, #liberacao, #primeiroVencimento, #periodicidade'); // Adicionado #percEntrada
     inputs.forEach(input => input.addEventListener('input', calcularTudo));
 
+    // Funções de formatação
     const formatCurrency = (value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-const formatDate = (date) => isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
+    const formatDate = (date) => isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
 
-function atualizarResumoInferior() {
-    const footerNumParcelas = document.getElementById('footer-num-parcelas');
-    const footerValorFinanciado = document.getElementById('footer-valor-financiado');
-    const footerTotalGeral = document.getElementById('footer-total-geral');
-    const parcelasInput = document.getElementById('parcelas');
-    const valorFinanciadoInput = document.getElementById('valorFinanciado');
-    const totalGeralCell = document.getElementById('total-geral');
+    function atualizarResumoInferior() {
+        const footerNumParcelas = document.getElementById('footer-num-parcelas');
+        const footerValorFinanciado = document.getElementById('footer-valor-financiado');
+        const footerTotalGeral = document.getElementById('footer-total-geral');
+        const parcelasInput = document.getElementById('parcelas');
+        const valorFinanciadoInput = document.getElementById('valorFinanciado');
+        const totalGeralCell = document.getElementById('total-geral');
 
-    if (footerNumParcelas && parcelasInput) {
-        footerNumParcelas.textContent = parcelasInput.value || '0';
+        if (footerNumParcelas && parcelasInput) {
+            footerNumParcelas.textContent = parcelasInput.value || '0';
+        }
+
+        if (footerValorFinanciado && valorFinanciadoInput) {
+            footerValorFinanciado.textContent = valorFinanciadoInput.value || 'R$ 0,00';
+        }
+
+        if (footerTotalGeral && totalGeralCell) {
+            footerTotalGeral.textContent = totalGeralCell.textContent || 'R$ 0,00';
+        }
     }
 
-    if (footerValorFinanciado && valorFinanciadoInput) {
-        footerValorFinanciado.textContent = valorFinanciadoInput.value || 'R$ 0,00';
+    function camposObrigatoriosPreenchidos() {
+        const campos = Array.from(document.querySelectorAll('#loan-form input, #loan-form select'))
+            .filter(campo => !campo.readOnly && !campo.disabled && campo.type !== 'button' && campo.type !== 'submit');
+
+        return campos.every(campo => String(campo.value).trim() !== '');
     }
 
-    if (footerTotalGeral && totalGeralCell) {
-        footerTotalGeral.textContent = totalGeralCell.textContent || 'R$ 0,00';
-    }
-}
+    function atualizarDisponibilidadePdf() {
+        const chip = document.getElementById('pdf-status-chip');
+        const chipText = document.getElementById('pdf-status-text');
+        const btnGerarPdf = document.getElementById('btn-gerar-pdf');
+        const disponivel = camposObrigatoriosPreenchidos();
 
-function camposObrigatoriosPreenchidos() {
-    const campos = Array.from(document.querySelectorAll('#loan-form input, #loan-form select'))
-        .filter(campo => !campo.readOnly && !campo.disabled && campo.type !== 'button' && campo.type !== 'submit');
+        if (chip && chipText) {
+            chip.classList.toggle('ready', disponivel);
+            chip.classList.toggle('pending', !disponivel);
+            chipText.textContent = disponivel ? 'PDF disponível' : 'Preencha os campos obrigatórios';
+        }
 
-    return campos.every(campo => String(campo.value).trim() !== '');
-}
-
-function atualizarDisponibilidadePdf() {
-    const chip = document.getElementById('pdf-status-chip');
-    const chipText = document.getElementById('pdf-status-text');
-    const btnGerarPdf = document.getElementById('btn-gerar-pdf');
-    const disponivel = camposObrigatoriosPreenchidos();
-
-    if (chip && chipText) {
-        chip.classList.toggle('ready', disponivel);
-        chip.classList.toggle('pending', !disponivel);
-        chipText.textContent = disponivel ? 'PDF disponível' : 'Preencha os campos obrigatórios';
+        if (btnGerarPdf) {
+            btnGerarPdf.disabled = !disponivel;
+        }
     }
 
-    if (btnGerarPdf) {
-        btnGerarPdf.disabled = !disponivel;
-    }
-}
-
-function configurarMenusDaPagina() {
+    function configurarMenusDaPagina() {
     const calculatorSelector = document.querySelector('.calculator-selector');
     const calculatorDropdown = document.querySelector('.calculator-dropdown');
     const floatingTopbar = document.getElementById('floating-topbar');
     const stickyCalculatorSelector = document.getElementById('sticky-calculator-selector');
     const stickyCalculatorDropdown = document.getElementById('sticky-calculator-dropdown');
 
+    function configurarSubgruposMenu(dropdownElement) {
+        if (!dropdownElement) return;
+
+        const toggles = dropdownElement.querySelectorAll('.menu-group-toggle');
+
+        function fecharTodos() {
+            dropdownElement.querySelectorAll('.menu-group-toggle').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-expanded', 'false');
+            });
+
+            dropdownElement.querySelectorAll('.menu-group-content').forEach(content => {
+                content.classList.remove('show');
+            });
+        }
+
+        toggles.forEach(toggle => {
+            toggle.setAttribute('aria-expanded', 'false');
+
+            toggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+
+                const content = toggle.nextElementSibling;
+                const estavaAberto = content && content.classList.contains('show');
+
+                fecharTodos();
+
+                if (!estavaAberto && content) {
+                    toggle.classList.add('active');
+                    toggle.setAttribute('aria-expanded', 'true');
+                    content.classList.add('show');
+                }
+            });
+        });
+
+        dropdownElement._fecharSubgrupos = fecharTodos;
+    }
+
     if (calculatorSelector && calculatorDropdown) {
+        configurarSubgruposMenu(calculatorDropdown);
+
         calculatorSelector.addEventListener('click', (event) => {
             event.stopPropagation();
             calculatorDropdown.classList.toggle('show');
+
+            if (!calculatorDropdown.classList.contains('show') && calculatorDropdown._fecharSubgrupos) {
+                calculatorDropdown._fecharSubgrupos();
+            }
         });
     }
 
@@ -125,9 +157,15 @@ function configurarMenusDaPagina() {
         stickyCalculatorDropdown &&
         calculatorSelector
     ) {
+        configurarSubgruposMenu(stickyCalculatorDropdown);
+
         stickyCalculatorSelector.addEventListener('click', (event) => {
             event.stopPropagation();
             stickyCalculatorDropdown.classList.toggle('show');
+
+            if (!stickyCalculatorDropdown.classList.contains('show') && stickyCalculatorDropdown._fecharSubgrupos) {
+                stickyCalculatorDropdown._fecharSubgrupos();
+            }
         });
 
         function toggleFloatingTopbar() {
@@ -139,6 +177,7 @@ function configurarMenusDaPagina() {
             } else {
                 floatingTopbar.classList.remove('show');
                 stickyCalculatorDropdown.classList.remove('show');
+                if (stickyCalculatorDropdown._fecharSubgrupos) stickyCalculatorDropdown._fecharSubgrupos();
             }
         }
 
@@ -155,6 +194,7 @@ function configurarMenusDaPagina() {
             !calculatorSelector.contains(event.target)
         ) {
             calculatorDropdown.classList.remove('show');
+            if (calculatorDropdown._fecharSubgrupos) calculatorDropdown._fecharSubgrupos();
         }
 
         if (
@@ -164,11 +204,12 @@ function configurarMenusDaPagina() {
             !stickyCalculatorSelector.contains(event.target)
         ) {
             stickyCalculatorDropdown.classList.remove('show');
+            if (stickyCalculatorDropdown._fecharSubgrupos) stickyCalculatorDropdown._fecharSubgrupos();
         }
     });
 }
 
-function configurarIndicacaoRolagemTabela() {
+    function configurarIndicacaoRolagemTabela() {
     const wrapper = document.querySelector('.table-wrapper');
 
     if (!wrapper) return;
@@ -219,16 +260,19 @@ function configurarIndicacaoRolagemTabela() {
 }
 
 const camposFormularioStatus = document.querySelectorAll('#loan-form input, #loan-form select');
-camposFormularioStatus.forEach(campo => {
-    campo.addEventListener('input', atualizarDisponibilidadePdf);
-    campo.addEventListener('change', atualizarDisponibilidadePdf);
-});
+    camposFormularioStatus.forEach(campo => {
+        campo.addEventListener('input', atualizarDisponibilidadePdf);
+        campo.addEventListener('change', atualizarDisponibilidadePdf);
+    });
 
+    // Função principal que faz todos os cálculos
     function calcularTudo(event) {
         if (event && event.isTrusted === false) return;
         atualizarCarenciaEValidar();
         const valorBemStr = document.getElementById('valorBem').value.replace(/\./g, '').replace(',', '.');
         const valorBem = parseFloat(valorBemStr) || 0;
+        // --- LÓGICA DE ENTRADA ATUALIZADA ---
+        // Lê a PORCENTAGEM de entrada
         const percEntrada = parseFloat(document.getElementById('percEntrada').value) || 0;
         // Calcula o VALOR da entrada
         const valorEntrada = valorBem * (percEntrada / 100);
@@ -236,59 +280,50 @@ camposFormularioStatus.forEach(campo => {
         const valorFinanciado = valorBem - valorEntrada;
         const numParcelas = parseInt(document.getElementById('parcelas').value) || 1;
         const taxaAA = parseFloat(document.getElementById('taxaAA').value) / 100 || 0;
-        
-        const cetAA = taxaAA;
-        const cetAM = (Math.pow(1 + cetAA, 1/12) - 1);
-
-        document.getElementById('cetAA').value = (cetAA * 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
-        document.getElementById('cetAM').value = (cetAM * 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
-        // --- FIM DA ALTERAÇÃO ---
-
+        document.getElementById('cetAA').value = (taxaAA * 100).toFixed(2).replace('.', ',') + '%';
         const dataLiberacao = new Date(document.getElementById('liberacao').value + 'T00:00:00');
-        // USAR DATA FIXA DO INPUT PARA NÃO OCORRER DRIFT (mudança de data gradual)
+        
+        // CORREÇÃO DATA: Usa a data original do input como base
         const dataPrimeiroVencimentoOriginal = new Date(document.getElementById('primeiroVencimento').value + 'T00:00:00');
         
         const periodicidade = document.getElementById('periodicidade').value;
         const principalPorParcela = numParcelas > 0 ? valorFinanciado / numParcelas : 0;
-        
         // Atualiza os campos na tela (usando .value para os inputs readonly)
         document.getElementById('valorEntrada').value = formatCurrency(valorEntrada); // Atualiza o novo campo
         document.getElementById('valorFinanciado').value = formatCurrency(valorFinanciado);
         document.getElementById('parcelasPrincipal').value = numParcelas;
         document.getElementById('total-principal').textContent = formatCurrency(valorFinanciado);
-                
         const tbody = document.getElementById('amortization-body');
         tbody.innerHTML = '';
         if (numParcelas <= 0 || isNaN(dataLiberacao.getTime()) || isNaN(dataPrimeiroVencimentoOriginal.getTime()) || valorFinanciado <= 0) {
         document.getElementById('total-juros').textContent = formatCurrency(0);
+        document.getElementById('total-principal').textContent = formatCurrency(0);
         document.getElementById('total-geral').textContent = formatCurrency(0);
         atualizarResumoInferior();
         atualizarDisponibilidadePdf();
         return;
     }
+
         
-        // O resto da lógica de cálculo da tabela permanece idêntico ao pronaf.js
         let saldoDevedor = valorFinanciado;
         let totalJuros = 0;
         let dataVencimentoAnterior = dataLiberacao;
 
         for (let i = 1; i <= numParcelas; i++) {
-            // LÓGICA CORRIGIDA: Calcula a data base sempre a partir da data original (evita pular dias)
+            // LÓGICA CORRIGIDA: Base sempre na original
             let dataBaseVencimento = new Date(dataPrimeiroVencimentoOriginal);
-            
-            if (i > 1) { 
+            if (i > 1) {
                 const parcelasAdicionais = i - 1;
                 if (periodicidade === 'ANUAL') { 
                     dataBaseVencimento.setFullYear(dataBaseVencimento.getFullYear() + parcelasAdicionais); 
                 } else if (periodicidade === 'SEMESTRAL') { 
                     dataBaseVencimento.setMonth(dataBaseVencimento.getMonth() + (parcelasAdicionais * 6)); 
                 } else { 
-                    // Caso ainda exista mensal ou seja adicionado depois
                     dataBaseVencimento.setMonth(dataBaseVencimento.getMonth() + parcelasAdicionais); 
                 }
             }
-
-            // Ajusta se cair em FDS/Feriado, mas isso não afeta a dataBase da próxima iteração
+            
+            // Ajusta para dia útil visualmente/calculo de dias, sem afetar a base
             const dataVencimentoAtual = ajustarParaProximoDiaUtil(dataBaseVencimento);
             
             const diffTime = Math.abs(dataVencimentoAtual - dataVencimentoAnterior);
@@ -308,6 +343,7 @@ camposFormularioStatus.forEach(campo => {
         atualizarDisponibilidadePdf();
     }
     
+    // Executa as funções iniciais assim que a página carrega
     setInitialDate();
     setDefaultVencimento();
     formatarValor(valorBemInput);
@@ -385,7 +421,7 @@ camposFormularioStatus.forEach(campo => {
 
         const totalVendedor = contarCaracteresNome(vendedor);
         const totalCliente = contarCaracteresNome(cliente);
-        const cpfFinalNumerico = Number(cpfFinal);
+        const cpfFinalNumerico = Number(String(cpfFinal || '').replace(/\D/g, '')) || 0;
         const somaFinal = totalVendedor + totalCliente + cpfFinalNumerico;
 
         return `${dia}${mes}${ano}${String(totalVendedor).padStart(2, '0')}${String(totalCliente).padStart(2, '0')}${String(somaFinal).padStart(4, '0')}`;
@@ -408,7 +444,7 @@ camposFormularioStatus.forEach(campo => {
         const elementosParaRemoverDoPdf = clone.querySelectorAll('.header-home-link, .floating-home-link');
         elementosParaRemoverDoPdf.forEach(elemento => elemento.remove());
 
-        // --- CORREÇÃO DA LOGO NO PDF OFFLINE ---
+        // --- CORREÇÃO DA LOGO ---
         // Converte a logo original em Base64 para garantir que o html2canvas consiga lê-la
         const originalLogo = document.querySelector('.logo-image');
         const clonedLogo = clone.querySelector('.logo-image');
@@ -428,20 +464,18 @@ camposFormularioStatus.forEach(campo => {
         }
 
         // --- CORREÇÃO DE DATAS NO PDF (Formato PT-BR Visual) ---
-        // Transforma os inputs type="date" em spans de texto DD/MM/AAAA
         const dateInputs = clone.querySelectorAll('input[type="date"]');
         dateInputs.forEach(input => {
             if (input.value) {
                 const span = document.createElement('span');
                 const [ano, mes, dia] = input.value.split('-');
                 span.textContent = `${dia}/${mes}/${ano}`;
-                // Copia estilos básicos para manter consistência visual
                 span.className = input.className; 
                 span.style.cssText = window.getComputedStyle(input).cssText;
-                span.style.border = '1px solid #ccc'; // Garante borda visível
+                span.style.border = '1px solid #ccc'; 
                 span.style.display = 'flex';
                 span.style.alignItems = 'center';
-                span.style.justifyContent = 'flex-end'; // Alinha à direita
+                span.style.justifyContent = 'flex-end'; 
                 input.parentNode.replaceChild(span, input);
             }
         });
@@ -476,7 +510,7 @@ camposFormularioStatus.forEach(campo => {
         let styleElement = null; // Variável para guardar o style injetado
         try {
             // Tenta buscar o conteúdo do CSS (virá do cache offline)
-            const cssPath = '../style/style.css'; // Ajuste o caminho se necessário!
+            const cssPath = '../../style/style.css'; // Ajuste o caminho se necessário!
             const response = await fetch(cssPath);
             if (!response.ok) throw new Error(`CSS não encontrado: ${response.statusText}`);
             const cssText = await response.text();
@@ -488,7 +522,6 @@ camposFormularioStatus.forEach(campo => {
 
         } catch (cssError) {
             console.error("Erro ao carregar ou injetar CSS para PDF:", cssError);
-            // Continua mesmo sem CSS externo, usando o que tiver
         }
         // <<< FIM DA MÁGICA >>>
         
@@ -554,7 +587,7 @@ camposFormularioStatus.forEach(campo => {
             }
             
             // Lembre-se de ajustar o nome do arquivo para cada simulador (ex: simulacao_pronaf.pdf)
-            pdf.save('simulacao_moderfrota.pdf');
+            pdf.save('simulacao_pronaf.pdf');
 
         } catch (error) {
             console.error("Erro ao gerar PDF:", error);
@@ -569,7 +602,8 @@ camposFormularioStatus.forEach(campo => {
         }
     }
     
-    // Menu da página já configurado acima
+    // --- NOVO: LÓGICA PARA O MENU DROPDOWN FUNCIONAR EM TODOS OS DISPOSITIVOS ---
+        // Menu da página já configurado acima
 });
 
 // --- REGISTRA O SERVICE WORKER ---

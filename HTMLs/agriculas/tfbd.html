@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador TFBD Rural</title>
-    <link rel="stylesheet" href="../style/style.css">
+    <link rel="stylesheet" href="../../style/style.css">
     <link rel="manifest" href="/Calculadora_PME/manifest.json">
 </head>
 <body>
     <div id="floating-topbar" class="floating-topbar simulator-floating-topbar">
         <div class="floating-topbar-left">
-            <a href="../index.html" class="floating-home-link" aria-label="Voltar para a página inicial">
+            <a href="../../index.html" class="floating-home-link" aria-label="Voltar para a página inicial">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path fill="currentColor" d="M12 3.2 3 10.4V21h6v-5.5h6V21h6v-10.6L12 3.2z"/>
                 </svg>
@@ -19,11 +19,31 @@
 
         <div class="sticky-calculator-selector" id="sticky-calculator-selector">
             <span>Simulador TFBD Rural</span> &#9662;
-            <div class="sticky-calculator-dropdown" id="sticky-calculator-dropdown">
-                <a href="../index.html">Página Inicial</a>
-                <a href="pronaf.html">Simulador AG: Pronaf</a>
-                <a href="moderfrota.html">Simulador Moderfrota</a>
-                <a href="tfbd.html">Simulador TFBD Rural</a>
+            <div class="sticky-calculator-dropdown menu-groups" id="sticky-calculator-dropdown">
+                <button type="button" class="menu-group-toggle">
+                    <span class="menu-group-label-row">
+                        <span class="menu-group-label-text">Agrícola</span>
+                        <span class="menu-group-mini-banner menu-group-mini-banner-agricola">Linhas AG</span>
+                    </span>
+                    <span class="menu-group-arrow">▾</span>
+                </button>
+                <div class="menu-group-content">
+                    <a href="pronaf.html">Simulador AG: Pronaf</a>
+                    <a href="moderfrota.html">Simulador Moderfrota</a>
+                    <a href="tfbd.html">Simulador TFBD Rural</a>
+                </div>
+
+                <button type="button" class="menu-group-toggle construction">
+                    <span class="menu-group-label-row">
+                        <span class="menu-group-label-text">Construção</span>
+                        <span class="menu-group-mini-banner menu-group-mini-banner-construcao">Linhas CE</span>
+                    </span>
+                    <span class="menu-group-arrow">▾</span>
+                </button>
+                <div class="menu-group-content">
+                    <a href="../construcao/cdc-ce.html">CDC Construção</a>
+                    <a href="../construcao/mais-inovacao-ce.html">Finame + Inovação</a>
+                </div>
             </div>
         </div>
     </div>
@@ -32,10 +52,10 @@
         <header>
             <div class="logo">
                 <span class="logo-main">Simulação de Financiamento</span>
-                <img src="../logos/LOGO_AMARELA.png" alt="Logo PME" class="logo-image">
+                <img src="../../logos/LOGO_AMARELA.png" alt="Logo PME" class="logo-image">
             </div>
             <div class="calculator-selector-row">
-                <a href="../index.html" class="header-home-link" aria-label="Voltar para a página inicial">
+                <a href="../../index.html" class="header-home-link" aria-label="Voltar para a página inicial">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path fill="currentColor" d="M12 3.2 3 10.4V21h6v-5.5h6V21h6v-10.6L12 3.2z"/>
                     </svg>
@@ -43,11 +63,25 @@
 
                 <div class="calculator-selector">
                     <span id="current-calculator">Simulador TFBD Rural</span> &#9662;
-                    <div class="calculator-dropdown">
-                        <a href="../index.html">Página Inicial</a>
-                        <a href="pronaf.html">Simulador AG: Pronaf</a>
-                        <a href="moderfrota.html">Simulador Moderfrota</a>
-                        <a href="tfbd.html">Simulador TFBD Rural</a>
+                    <div class="calculator-dropdown menu-groups">
+                        <button type="button" class="menu-group-toggle">
+                            <span>Agrícola</span>
+                            <span class="menu-group-arrow">▾</span>
+                        </button>
+                        <div class="menu-group-content">
+                            <a href="pronaf.html">Simulador AG: Pronaf</a>
+                            <a href="moderfrota.html">Simulador Moderfrota</a>
+                            <a href="tfbd.html">Simulador TFBD Rural</a>
+                        </div>
+
+                        <button type="button" class="menu-group-toggle construction">
+                            <span>Construção</span>
+                            <span class="menu-group-arrow">▾</span>
+                        </button>
+                        <div class="menu-group-content">
+                            <a href="../construcao/cdc-ce.html">CDC Construção</a>
+                            <a href="../construcao/mais-inovacao-ce.html">Finame + Inovação</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -167,9 +201,9 @@
             <button id="btn-gerar-pdf">Gerar PDF</button>
         </div>
     </div>
-    <script src="../vendor/html2canvas.min.js"></script>
-    <script src="../vendor/jspdf.umd.min.js"></script>
-    <script src="../script/tfbd.js"></script>
+    <script src="../../vendor/html2canvas.min.js"></script>
+    <script src="../../vendor/jspdf.umd.min.js"></script>
+    <script src="../../script/agriculas/tfbd.js"></script>
 
     <div id="pdf-modal-overlay" class="modal-overlay">
     <div class="modal-content pdf-modal-content">

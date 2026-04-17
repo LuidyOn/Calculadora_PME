@@ -15,13 +15,34 @@
         <img src="logos/LOGO_AMARELA.png" alt="Logo PME" class="logo-image">
     </div>
     <div class="calculator-selector">
-        <span id="current-calculator">Selecione um Simulador</span> &#9662;
-        <div class="calculator-dropdown">
-            <a href="./HTMLs/pronaf.html">Simulador AG: Pronaf</a>
-            <a href="./HTMLs/moderfrota.html">Simulador Moderfrota</a>
-            <a href="./HTMLs/tfbd.html">Simulador TFBD Rural</a>
+    <span id="current-calculator">Selecione um Simulador</span> &#9662;
+    <div class="calculator-dropdown menu-groups">
+        <button type="button" class="menu-group-toggle">
+            <span class="menu-group-label-row">
+                <span class="menu-group-label-text">Agrícola</span>
+                <img src="./img/ag.png" alt="Banner Agrícola" class="menu-group-banner-image">
+            </span>
+            <span class="menu-group-arrow">▾</span>
+        </button>
+        <div class="menu-group-content">
+            <a href="./HTMLs/agriculas/pronaf.html">Simulador AG: Pronaf</a>
+            <a href="./HTMLs/agriculas/moderfrota.html">Simulador Moderfrota</a>
+            <a href="./HTMLs/agriculas/tfbd.html">Simulador TFBD Rural</a>
+        </div>
+
+        <button type="button" class="menu-group-toggle construction">
+            <span class="menu-group-label-row">
+                <span class="menu-group-label-text">Construção</span>
+                <img src="./img/ce.png" alt="Banner Construção" class="menu-group-banner-image">
+            </span>
+            <span class="menu-group-arrow">▾</span>
+        </button>
+        <div class="menu-group-content">
+            <a href="./HTMLs/construcao/cdc-ce.html">CDC Construção</a>
+            <a href="./HTMLs/construcao/mais-inovacao-ce.html">Finame + Inovação</a>
         </div>
     </div>
+</div>
 </header>
 
 <div id="floating-topbar" class="floating-topbar">
@@ -30,13 +51,31 @@
     </a>
 
     <div class="sticky-calculator-selector" id="sticky-calculator-selector">
-        <span>Selecione um Simulador</span> &#9662;
-        <div class="sticky-calculator-dropdown" id="sticky-calculator-dropdown">
-            <a href="./HTMLs/pronaf.html">Simulador AG: Pronaf</a>
-            <a href="./HTMLs/moderfrota.html">Simulador Moderfrota</a>
-            <a href="./HTMLs/tfbd.html">Simulador TFBD Rural</a>
+    <span>Selecione um Simulador</span> &#9662;
+    <div class="sticky-calculator-dropdown menu-groups" id="sticky-calculator-dropdown">
+        <button type="button" class="menu-group-toggle">
+            <span class="menu-group-label-row">
+                <span class="menu-group-label-text">Agrícola</span>
+                <span class="menu-group-mini-banner menu-group-mini-banner-agricola">Linhas AG</span>
+            </span>
+            <span class="menu-group-arrow">▾</span>
+        </button>
+        <div class="menu-group-content">
+            <a href="./HTMLs/agriculas/pronaf.html">Simulador AG: Pronaf</a>
+            <a href="./HTMLs/agriculas/moderfrota.html">Simulador Moderfrota</a>
+            <a href="./HTMLs/agriculas/tfbd.html">Simulador TFBD Rural</a>
+        </div>
+
+        <button type="button" class="menu-group-toggle construction">
+            <span>Construção</span>
+            <span class="menu-group-arrow">▾</span>
+        </button>
+        <div class="menu-group-content">
+            <a href="./HTMLs/construcao/cdc-ce.html">CDC Construção</a>
+            <a href="./HTMLs/construcao/mais-inovacao-ce.html">Finame + Inovação</a>
         </div>
     </div>
+</div>
 </div>
 
 <div class="banner-container">
@@ -53,7 +92,7 @@
                     </button>
                     <div class="collapsible-content">
                         <p>
-                            Nossas ferramentas fornecem projeções detalhadas para ajudar no seu planejamento financeiro, oferecendo simulações para diferentes linhas de crédito como Pronaf, Moderfrota e TFBD Rural. Calcule parcelas, juros e visualize o fluxo de pagamento completo.
+                            Nossas ferramentas fornecem projeções detalhadas para ajudar no seu planejamento financeiro, oferecendo simuladores para linhas agrícolas e, em breve, também para linhas de construção. Calcule parcelas, juros e visualize o fluxo de pagamento completo.
                         </p>
                     </div>
                 </div>

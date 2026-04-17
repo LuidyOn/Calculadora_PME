@@ -81,67 +81,120 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function configurarMenusDaPagina() {
-        const calculatorSelector = document.querySelector('.calculator-selector');
-        const calculatorDropdown = document.querySelector('.calculator-dropdown');
-        const floatingTopbar = document.getElementById('floating-topbar');
-        const stickyCalculatorSelector = document.getElementById('sticky-calculator-selector');
-        const stickyCalculatorDropdown = document.getElementById('sticky-calculator-dropdown');
+    const calculatorSelector = document.querySelector('.calculator-selector');
+    const calculatorDropdown = document.querySelector('.calculator-dropdown');
+    const floatingTopbar = document.getElementById('floating-topbar');
+    const stickyCalculatorSelector = document.getElementById('sticky-calculator-selector');
+    const stickyCalculatorDropdown = document.getElementById('sticky-calculator-dropdown');
 
-        if (calculatorSelector && calculatorDropdown) {
-            calculatorSelector.addEventListener('click', (event) => {
-                event.stopPropagation();
-                calculatorDropdown.classList.toggle('show');
+    function configurarSubgruposMenu(dropdownElement) {
+        if (!dropdownElement) return;
+
+        const toggles = dropdownElement.querySelectorAll('.menu-group-toggle');
+
+        function fecharTodos() {
+            dropdownElement.querySelectorAll('.menu-group-toggle').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-expanded', 'false');
+            });
+
+            dropdownElement.querySelectorAll('.menu-group-content').forEach(content => {
+                content.classList.remove('show');
             });
         }
 
-        if (
-            floatingTopbar &&
-            stickyCalculatorSelector &&
-            stickyCalculatorDropdown &&
-            calculatorSelector
-        ) {
-            stickyCalculatorSelector.addEventListener('click', (event) => {
+        toggles.forEach(toggle => {
+            toggle.setAttribute('aria-expanded', 'false');
+
+            toggle.addEventListener('click', (event) => {
                 event.stopPropagation();
-                stickyCalculatorDropdown.classList.toggle('show');
-            });
 
-            function toggleFloatingTopbar() {
-                const selectorRect = calculatorSelector.getBoundingClientRect();
-                const shouldShowFloatingBar = selectorRect.bottom < 0;
+                const content = toggle.nextElementSibling;
+                const estavaAberto = content && content.classList.contains('show');
 
-                if (shouldShowFloatingBar) {
-                    floatingTopbar.classList.add('show');
-                } else {
-                    floatingTopbar.classList.remove('show');
-                    stickyCalculatorDropdown.classList.remove('show');
+                fecharTodos();
+
+                if (!estavaAberto && content) {
+                    toggle.classList.add('active');
+                    toggle.setAttribute('aria-expanded', 'true');
+                    content.classList.add('show');
                 }
-            }
+            });
+        });
 
-            window.addEventListener('scroll', toggleFloatingTopbar, { passive: true });
-            window.addEventListener('resize', toggleFloatingTopbar);
-            toggleFloatingTopbar();
-        }
+        dropdownElement._fecharSubgrupos = fecharTodos;
+    }
 
-        window.addEventListener('click', (event) => {
-            if (
-                calculatorDropdown &&
-                calculatorDropdown.classList.contains('show') &&
-                calculatorSelector &&
-                !calculatorSelector.contains(event.target)
-            ) {
-                calculatorDropdown.classList.remove('show');
-            }
+    if (calculatorSelector && calculatorDropdown) {
+        configurarSubgruposMenu(calculatorDropdown);
 
-            if (
-                stickyCalculatorDropdown &&
-                stickyCalculatorDropdown.classList.contains('show') &&
-                stickyCalculatorSelector &&
-                !stickyCalculatorSelector.contains(event.target)
-            ) {
-                stickyCalculatorDropdown.classList.remove('show');
+        calculatorSelector.addEventListener('click', (event) => {
+            event.stopPropagation();
+            calculatorDropdown.classList.toggle('show');
+
+            if (!calculatorDropdown.classList.contains('show') && calculatorDropdown._fecharSubgrupos) {
+                calculatorDropdown._fecharSubgrupos();
             }
         });
     }
+
+    if (
+        floatingTopbar &&
+        stickyCalculatorSelector &&
+        stickyCalculatorDropdown &&
+        calculatorSelector
+    ) {
+        configurarSubgruposMenu(stickyCalculatorDropdown);
+
+        stickyCalculatorSelector.addEventListener('click', (event) => {
+            event.stopPropagation();
+            stickyCalculatorDropdown.classList.toggle('show');
+
+            if (!stickyCalculatorDropdown.classList.contains('show') && stickyCalculatorDropdown._fecharSubgrupos) {
+                stickyCalculatorDropdown._fecharSubgrupos();
+            }
+        });
+
+        function toggleFloatingTopbar() {
+            const selectorRect = calculatorSelector.getBoundingClientRect();
+            const shouldShowFloatingBar = selectorRect.bottom < 0;
+
+            if (shouldShowFloatingBar) {
+                floatingTopbar.classList.add('show');
+            } else {
+                floatingTopbar.classList.remove('show');
+                stickyCalculatorDropdown.classList.remove('show');
+                if (stickyCalculatorDropdown._fecharSubgrupos) stickyCalculatorDropdown._fecharSubgrupos();
+            }
+        }
+
+        window.addEventListener('scroll', toggleFloatingTopbar, { passive: true });
+        window.addEventListener('resize', toggleFloatingTopbar);
+        toggleFloatingTopbar();
+    }
+
+    window.addEventListener('click', (event) => {
+        if (
+            calculatorDropdown &&
+            calculatorDropdown.classList.contains('show') &&
+            calculatorSelector &&
+            !calculatorSelector.contains(event.target)
+        ) {
+            calculatorDropdown.classList.remove('show');
+            if (calculatorDropdown._fecharSubgrupos) calculatorDropdown._fecharSubgrupos();
+        }
+
+        if (
+            stickyCalculatorDropdown &&
+            stickyCalculatorDropdown.classList.contains('show') &&
+            stickyCalculatorSelector &&
+            !stickyCalculatorSelector.contains(event.target)
+        ) {
+            stickyCalculatorDropdown.classList.remove('show');
+            if (stickyCalculatorDropdown._fecharSubgrupos) stickyCalculatorDropdown._fecharSubgrupos();
+        }
+    });
+}
 
     function configurarIndicacaoRolagemTabela() {
     const wrapper = document.querySelector('.table-wrapper');
@@ -491,7 +544,7 @@ const camposFormularioStatus = document.querySelectorAll('#loan-form input, #loa
         let styleElement = null; // Variável para guardar o style injetado
         try {
             // Tenta buscar o conteúdo do CSS (virá do cache offline)
-            const cssPath = '../style/style.css'; // Ajuste o caminho se necessário!
+            const cssPath = '../../style/style.css'; // Ajuste o caminho se necessário!
             const response = await fetch(cssPath);
             if (!response.ok) throw new Error(`CSS não encontrado: ${response.statusText}`);
             const cssText = await response.text();

@@ -8,13 +8,17 @@ const urlsToCache = [
   '/Calculadora_PME/style/style.css',
 
   '/Calculadora_PME/script/main.js',
-  '/Calculadora_PME/script/pronaf.js',
-  '/Calculadora_PME/script/moderfrota.js',
-  '/Calculadora_PME/script/tfbd.js',
+  '/Calculadora_PME/script/agriculas/pronaf.js',
+  '/Calculadora_PME/script/agriculas/moderfrota.js',
+  '/Calculadora_PME/script/agriculas/tfbd.js',
+  '/Calculadora_PME/script/construcao/cdc-ce.js',
+  '/Calculadora_PME/script/construcao/mais-inovacao-ce.js',
 
-  '/Calculadora_PME/HTMLs/pronaf.html',
-  '/Calculadora_PME/HTMLs/moderfrota.html',
-  '/Calculadora_PME/HTMLs/tfbd.html',
+  '/Calculadora_PME/HTMLs/agriculas/pronaf.html',
+  '/Calculadora_PME/HTMLs/agriculas/moderfrota.html',
+  '/Calculadora_PME/HTMLs/agriculas/tfbd.html',
+  '/Calculadora_PME/HTMLs/construcao/cdc-ce.html',
+  '/Calculadora_PME/HTMLs/construcao/mais-inovacao-ce.html',
 
   '/Calculadora_PME/vendor/html2canvas.min.js',
   '/Calculadora_PME/vendor/jspdf.umd.min.js',
