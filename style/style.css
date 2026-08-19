@@ -154,7 +154,7 @@ header {
     box-sizing: border-box;
     width: 100%;
     padding: 6px 8px;
-    min-height: px;/* Altura mínima consistente para todos */
+    min-height: 33.5px; /* Altura mínima consistente para todos */
     border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 1em;
@@ -1666,10 +1666,12 @@ table td {
     border: none;
     background: #ffffff;
     color: var(--primary-blue);
+    font-family: inherit;
     font-size: 0.98em;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.03em;
+    text-align: left;
     cursor: pointer;
     box-sizing: border-box;
 }
@@ -1737,7 +1739,7 @@ table td {
     }
 }
 /* ========================================================== */
-/* === MINI BANNERS NOS SUBMENUS ============================ */
+/* === TAGS NOS SUBMENUS ==================================== */
 /* ========================================================== */
 
 .menu-group-label-row {
@@ -1745,6 +1747,7 @@ table td {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    flex: 1;
     width: 100%;
     min-width: 0;
 }
@@ -1754,12 +1757,12 @@ table td {
     min-width: 0;
 }
 
-.menu-group-mini-banner {
+.menu-group-tag {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 108px;
-    padding: 6px 12px;
+    min-width: 98px;
+    padding: 5px 10px;
     border-radius: 6px;
     font-size: 0.72em;
     font-weight: 800;
@@ -1773,13 +1776,13 @@ table td {
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
 }
 
-.menu-group-mini-banner-agricola {
+.menu-group-tag-agricola {
     border-color: #c9d9eb;
     background: linear-gradient(180deg, #f8fbff 0%, #eaf3fb 100%);
     color: var(--primary-blue);
 }
 
-.menu-group-mini-banner-construcao {
+.menu-group-tag-construcao {
     border-color: #ead7a4;
     background: linear-gradient(180deg, #fffaf0 0%, #f7edd0 100%);
     color: #9a6a00;
@@ -1790,9 +1793,9 @@ table td {
         gap: 8px;
     }
 
-    .menu-group-mini-banner {
-        min-width: 92px;
-        padding: 5px 10px;
+    .menu-group-tag {
+        min-width: 86px;
+        padding: 4px 8px;
         font-size: 0.68em;
     }
 }
