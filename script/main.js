@@ -212,8 +212,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- REGISTRA O SERVICE WORKER ---
 if ('serviceWorker' in navigator) {
+  // Recarrega UMA vez quando uma versao nova do app assume o controle. Sem isso,
+  // apos uma publicacao o celular fica com o CSS antigo do cache + o HTML/JS novos.
+  (function () {
+      var jaRecarregou = false;
+      var tinhaControlador = !!navigator.serviceWorker.controller;
+
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (!tinhaControlador || jaRecarregou) return;
+          jaRecarregou = true;
+          window.location.reload();
+      });
+  })();
+
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/Calculadora_PME/service-worker.js', { scope: '/Calculadora_PME/' })
+    navigator.serviceWorker.register('/Calculadora_PME/service-worker.js', { scope: '/Calculadora_PME/', updateViaCache: 'none' })
     .then(registration => {
         console.log('Service Worker registrado com sucesso no escopo:', registration.scope);
     })

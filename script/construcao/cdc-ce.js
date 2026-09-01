@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const printContainer = document.createElement('div');
         printContainer.style.position = 'absolute';
-        printContainer.style.left = '0';
+        printContainer.style.left = '-12000px'; // fora da tela: com left 0 e 1200px de largura, o documento alargava e a pagina 'pulava' no celular durante a geracao
         printContainer.style.top = '-9999px';
         printContainer.style.width = '1200px';
         printContainer.classList.add('pdf-compact-mode');
@@ -577,8 +577,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 if ('serviceWorker' in navigator) {
+    // Recarrega UMA vez quando uma versao nova do app assume o controle. Sem isso,
+    // apos uma publicacao o celular fica com o CSS antigo do cache + o HTML/JS novos.
+    (function () {
+        var jaRecarregou = false;
+        var tinhaControlador = !!navigator.serviceWorker.controller;
+
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+            if (!tinhaControlador || jaRecarregou) return;
+            jaRecarregou = true;
+            window.location.reload();
+        });
+    })();
+
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/Calculadora_PME/service-worker.js', { scope: '/Calculadora_PME/' })
+        navigator.serviceWorker.register('/Calculadora_PME/service-worker.js', { scope: '/Calculadora_PME/', updateViaCache: 'none' })
             .then(registration => {
                 console.log('Service Worker registrado com sucesso no escopo:', registration.scope);
             })

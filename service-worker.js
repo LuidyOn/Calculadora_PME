@@ -1,6 +1,6 @@
 // service-worker.js (VERSÃO ROBUSTA)
 
-const CACHE_NAME = 'simulador-financeiro-cache-v2.1.1'; // !!!!!!!!SEMPRE ATUALIZE A VERSÃO AQUI E NO INDEX ANTES DE SUBIR A APLICAÇÃO COM MUDANÇAS!!!!!!!!!
+const CACHE_NAME = 'simulador-financeiro-cache-v2.1.2'; // !!!!!!!!SEMPRE ATUALIZE A VERSÃO AQUI E NO INDEX ANTES DE SUBIR A APLICAÇÃO COM MUDANÇAS!!!!!!!!!
 const urlsToCache = [
   '/Calculadora_PME/',
   '/Calculadora_PME/index.html',
@@ -8,6 +8,7 @@ const urlsToCache = [
   '/Calculadora_PME/style/style.css',
 
   '/Calculadora_PME/script/main.js',
+  '/Calculadora_PME/script/table-sticky-header.js',
   '/Calculadora_PME/script/agriculas/pronaf.js',
   '/Calculadora_PME/script/agriculas/moderfrota.js',
   '/Calculadora_PME/script/agriculas/tfbd.js',
@@ -60,46 +61,52 @@ self.addEventListener('activate', event => {
   );
 });
 
-// --- Evento 'fetch' (ESTRATÉGIA ROBUSTA) ---
+// --- Evento 'fetch' (STALE-WHILE-REVALIDATE) ---
+//
+// A estratégia anterior era "cache first" puro: uma vez que o arquivo entrava
+// no cache, ele NUNCA mais era atualizado enquanto o cache existisse. Depois de
+// uma publicação, o celular continuava recebendo o style.css antigo junto com o
+// HTML/JS novos — mistura que quebrava o layout.
+//
+// Agora: entrega o cache na hora (rápido e funciona offline) e, em paralelo,
+// busca a versão nova na rede e regrava o cache. A próxima abertura já vem
+// correta, mesmo que o próprio service worker não tenha mudado.
 self.addEventListener('fetch', event => {
-  // Ignora requisições não-GET ou de extensões
-  if (event.request.method !== 'GET' || event.request.url.startsWith('chrome-extension://')) {
-    return;
-  }
+  const request = event.request;
 
-  // Estratégia: Cache first, fallback to network. For navigation errors, fallback to offline page (index.html).
+  // Ignora requisições não-GET, de extensões e de outras origens
+  if (request.method !== 'GET') return;
+  if (!request.url.startsWith(self.location.origin)) return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        // 1. Encontrou no Cache? Entrega!
+    caches.open(CACHE_NAME).then(cache =>
+      cache.match(request).then(cachedResponse => {
+        const redeEmParalelo = fetch(request)
+          .then(networkResponse => {
+            // Só guarda respostas próprias e bem-sucedidas
+            if (networkResponse && networkResponse.ok && networkResponse.type === 'basic') {
+              cache.put(request, networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(error => {
+            // Offline (ou erro de rede)
+            if (!cachedResponse && request.mode === 'navigate') {
+              console.warn('SW: Falha de navegação, servindo index.html do cache.', error);
+              return caches.match('/Calculadora_PME/index.html');
+            }
+            if (!cachedResponse) console.warn('SW: Fetch falhou:', request.url, error);
+            return undefined;
+          });
+
+        // Tem cache? Entrega já; a revalidação segue em segundo plano.
         if (cachedResponse) {
-          // console.log('SW: Servindo do cache:', event.request.url);
+          event.waitUntil(redeEmParalelo);
           return cachedResponse;
         }
 
-        // 2. Não achou no Cache? Tenta a Rede.
-        // console.log('SW: Buscando na rede:', event.request.url);
-        return fetch(event.request).then(
-          networkResponse => {
-            // 3. Rede funcionou? Entrega a resposta da rede.
-            // console.log('SW: Servindo da rede:', event.request.url);
-            // Opcional: guardar a resposta no cache aqui se desejar cache dinâmico.
-            return networkResponse;
-          }
-        ).catch(error => {
-          // 4. Rede FALHOU (Offline ou erro)?
-          console.warn('SW: Fetch da rede falhou:', event.request.url, error);
-
-          // 5. Se foi uma NAVEGAÇÃO, entrega o index.html do cache como fallback!
-          if (event.request.mode === 'navigate') {
-            console.log('SW: Falha de navegação. Servindo fallback /Calculadora_PME/index.html do cache.');
-            return caches.match('/Calculadora_PME/index.html'); 
-          }
-
-          // 6. Se NÃO foi navegação (imagem, etc.), apenas retorna erro (ou um placeholder)
-          // Retornar 'undefined' deixa o navegador mostrar o erro padrão para aquele recurso.
-          return undefined; 
-        });
+        return redeEmParalelo;
       })
+    )
   );
 });

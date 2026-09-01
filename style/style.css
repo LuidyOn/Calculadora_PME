@@ -774,16 +774,15 @@ table td {
 
 /* --- Estilos para os Banners de Imagem (Correção Full-Width) --- */
 .banner-container {
-    /* 1. Compensa o padding de 20px do container pai */
-    margin-left: -20px;
-    margin-right: -20px;
-    
-    /* 2. Calcula a largura total somando os 40px que "roubamos" das margens */
-    width: calc(100% + 40px);
-    
+    /* Ocupa a largura útil do container, sem estourar para fora dele.
+       (Antes usava margens negativas + width: calc(100% + 40px), o que
+       deixava o banner deslocado e criava rolagem horizontal na página.) */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+
     /* Ajustes visuais */
-    margin-top: 0; /* Encosta no header */
-    margin-bottom: 30px; /* Espaço embaixo */
+    margin: 0 0 30px; /* Encosta no header e deixa espaço embaixo */
     height: 300px; /* Altura do banner */
     overflow: hidden;
     position: relative;
@@ -799,7 +798,7 @@ table td {
 }
 
 /* Ajuste para telas menores (celulares) */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .banner-container {
         height: 180px; /* Altura menor no celular */
         /* Mantemos as margens negativas pois o padding do pai continua existindo no mobile */
@@ -1047,7 +1046,7 @@ table td {
     background-color: var(--light-gray);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .landing-page.collapsible {
         padding: 16px 0 0 0;
     }
@@ -1162,7 +1161,7 @@ table td {
     flex-shrink: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .has-bottom-bar {
         padding-bottom: 150px;
     }
@@ -1333,7 +1332,7 @@ table td {
     box-shadow: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .floating-topbar-left {
         gap: 8px;
     }
@@ -1412,7 +1411,7 @@ table td {
     display: block;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .calculator-selector-row {
         gap: 8px;
     }
@@ -1436,7 +1435,7 @@ table td {
     display: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .table-scroll-hint {
         display: flex;
         align-items: center;
@@ -1582,7 +1581,7 @@ table td {
     border-radius: 10px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .pdf-modal-content {
         width: calc(100% - 24px);
         padding: 22px 18px 18px;
@@ -1732,7 +1731,7 @@ table td {
     background-color: #8f6706;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .menu-group-toggle {
         padding: 12px 14px;
         font-size: 0.95em;
@@ -1788,7 +1787,7 @@ table td {
     color: #9a6a00;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .menu-group-label-row {
         gap: 8px;
     }
@@ -1842,6 +1841,11 @@ table td {
 
 html {
     background: #edf3f8;
+    /* Cinto de segurança: nenhum elemento pode criar rolagem horizontal na
+       página — a tabela rola dentro do próprio .table-wrapper. Era esse tipo
+       de estouro que cortava o menu fixo e descentralizava a página no
+       celular após o zoom. */
+    overflow-x: hidden;
 }
 
 body {
@@ -1911,7 +1915,10 @@ body > .simulator-container .calculator-selector-row {
 body > .simulator-container .calculator-selector {
     min-height: 52px;
     margin: 0;
-    padding: 14px 52px 14px 20px;
+    /* Padding simétrico: a seta (&#9662;) é texto, e o ::after que ocupava
+       os 52px da direita está desativado — o recuo extra só deixava o
+       rótulo fora do centro. */
+    padding: 14px 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2190,6 +2197,9 @@ body > .simulator-container .table-scroll-hint::before {
 body > .simulator-container .table-wrapper {
     position: relative;
     width: 100%;
+    /* sem isto a borda de 1px soma à largura e o card da tabela fica
+       2px mais largo (e desalinhado) em relação aos demais blocos */
+    box-sizing: border-box;
     margin-top: 0;
     padding-bottom: 5px;
     overflow-x: auto;
@@ -2326,7 +2336,7 @@ body > .simulator-container .bottom-action-bar {
 
 .sticky-calculator-selector {
     min-height: 42px;
-    padding: 10px 44px 10px 16px;
+    padding: 10px 16px;
     border-radius: 11px;
     background: linear-gradient(135deg, #0759a8 0%, #073d74 100%);
     border-bottom: 2px solid rgba(246, 201, 0, 0.68);
@@ -2337,7 +2347,10 @@ body > .simulator-container .bottom-action-bar {
 .banner-container {
     position: relative;
     min-height: 330px;
+    width: 100%;
+    max-width: 100%;
     margin: 0;
+    box-sizing: border-box;
     overflow: hidden;
     border-radius: 20px;
     background: var(--dark-blue);
@@ -2642,7 +2655,7 @@ body > .simulator-container .bottom-action-bar {
 
     body > .simulator-container .calculator-selector {
         min-height: 48px;
-        padding: 12px 44px 12px 14px;
+        padding: 12px 14px;
         border-radius: 12px;
         font-size: 0.9rem;
     }
@@ -2836,6 +2849,74 @@ body > .simulator-container .bottom-action-bar {
 }
 
 /* ========================================================== */
+/* === LINHA DE TÍTULOS FIXA DAS TABELAS ==================== */
+/* ========================================================== */
+
+/*
+ * A tabela vive dentro de .table-wrapper, que rola na horizontal.
+ * Um contêiner com rolagem "prende" o position: sticky nele mesmo, então
+ * o <thead> original nunca conseguiria se fixar em relação à janela.
+ * A solução é espelhar a linha de títulos nesta barra fixa, posicionada
+ * pelo JS logo abaixo do menu flutuante (com folga) e sincronizada com a
+ * rolagem horizontal da tabela.
+ */
+.sticky-thead {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    display: none;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 12px 26px rgba(8, 47, 87, 0.22), 0 3px 8px rgba(8, 47, 87, 0.12);
+    /* Abaixo do menu flutuante (999) e da barra inferior (950). */
+    z-index: 940;
+    /* Deixa o toque/arrasto passar direto para a tabela embaixo. */
+    pointer-events: none;
+}
+
+.sticky-thead.show {
+    display: block;
+}
+
+.sticky-thead-track {
+    will-change: transform;
+}
+
+.sticky-thead table {
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    font-variant-numeric: tabular-nums;
+}
+
+.sticky-thead th {
+    box-sizing: border-box;
+    padding: 13px 14px;
+    border: 0;
+    color: #ffffff;
+    background: #0a477f;
+    box-shadow: inset 0 3px 0 rgba(246, 201, 0, 0.66);
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.7rem;
+    font-weight: 750;
+    letter-spacing: 0.045em;
+    line-height: 1.5;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sticky-thead th:nth-child(3) {
+    text-align: center;
+}
+
+.sticky-thead th:nth-child(n+4) {
+    text-align: right;
+}
+
+/* ========================================================== */
 /* === PROTEÇÃO DO LAYOUT ORIGINAL DO PDF =================== */
 /* ========================================================== */
 
@@ -2871,7 +2952,7 @@ body > .simulator-container .bottom-action-bar {
     padding-bottom: 132px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .pdf-compact-mode .simulator-container.has-bottom-bar {
         padding-bottom: 160px;
     }
