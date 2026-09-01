@@ -444,179 +444,32 @@ camposFormularioStatus.forEach(campo => {
         return `${dia}${mes}${ano}${String(totalVendedor).padStart(2, '0')}${String(totalCliente).padStart(2, '0')}${String(somaFinal).padStart(4, '0')}`;
     }
 
-    // A função de gerar PDF inteira, com as correções
+    // Geração do PDF: documento vetorial desenhado pelo módulo comum
+    // (script/pdf-documento.js), que lê os valores exibidos na página.
     async function generatePdf(vendedor, cliente, cpfFinal) {
-        const originalElement = document.getElementById('capture');
         const btnGerarPdf = document.getElementById('btn-gerar-pdf');
         const originalButtonText = btnGerarPdf.textContent;
 
         btnGerarPdf.textContent = 'Gerando...';
         btnGerarPdf.disabled = true;
-        
-        // PASSO 1: Clonar o elemento
-        const clone = originalElement.cloneNode(true);
-        const clonedActionsDiv = clone.querySelector('.actions');
-        if (clonedActionsDiv) clonedActionsDiv.style.display = 'none';
 
-        const elementosParaRemoverDoPdf = clone.querySelectorAll('.header-home-link, .floating-home-link');
-        elementosParaRemoverDoPdf.forEach(elemento => elemento.remove());
+        try {
+            if (!window.PmePdfDocumento) throw new Error('Gerador de PDF não carregado.');
 
-        // --- CORREÇÃO DA LOGO NO PDF OFFLINE ---
-        // Converte a logo original em Base64 para garantir que o html2canvas consiga lê-la
-        const originalLogo = document.querySelector('.logo-image');
-        const clonedLogo = clone.querySelector('.logo-image');
-        
-        if (originalLogo && clonedLogo && originalLogo.complete) {
-            try {
-                const canvasLogo = document.createElement('canvas');
-                canvasLogo.width = originalLogo.naturalWidth;
-                canvasLogo.height = originalLogo.naturalHeight;
-                const ctxLogo = canvasLogo.getContext('2d');
-                ctxLogo.drawImage(originalLogo, 0, 0);
-                // Substitui o link "../logos/..." pelo código da imagem direta
-                clonedLogo.src = canvasLogo.toDataURL('image/png');
-            } catch (err) {
-                console.warn("Erro ao converter logo para PDF (possível bloqueio de segurança/CORS):", err);
-            }
-        }
-
-        // --- CORREÇÃO DE DATAS NO PDF (Formato PT-BR Visual) ---
-        // Transforma os inputs type="date" em spans de texto DD/MM/AAAA
-        const dateInputs = clone.querySelectorAll('input[type="date"]');
-        dateInputs.forEach(input => {
-            if (input.value) {
-                const span = document.createElement('span');
-                const [ano, mes, dia] = input.value.split('-');
-                span.textContent = `${dia}/${mes}/${ano}`;
-                // Copia estilos básicos para manter consistência visual
-                span.className = input.className; 
-                span.style.cssText = window.getComputedStyle(input).cssText;
-                span.style.border = '1px solid #ccc'; // Garante borda visível
-                span.style.display = 'flex';
-                span.style.alignItems = 'center';
-                span.style.justifyContent = 'flex-end'; // Alinha à direita
-                input.parentNode.replaceChild(span, input);
-            }
-        });
-
-        // Adiciona as informações do vendedor/cliente no cabeçalho do clone
-        const header = clone.querySelector('header');
-        if (header) {
-            const infoDiv = document.createElement('div');
             const dataSimulacao = new Date();
-            const dataSimulacaoTexto = dataSimulacao.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
             const codigoSimulacao = gerarCodigoSimulacao(dataSimulacao, vendedor, cliente, cpfFinal);
 
-            infoDiv.className = 'pdf-info';
-            infoDiv.innerHTML = `
-                <p><strong>Vendedor:</strong> ${vendedor}</p>
-                <p><strong>Cliente:</strong> ${cliente}</p>
-                <p><strong>Data da Simulação:</strong> ${dataSimulacaoTexto}</p>
-                <p><strong>Código da Simulação:</strong> ${codigoSimulacao}</p>
-            `;
-            header.appendChild(infoDiv);
-        }
-        
-        // PASSO 2: Criar container off-screen
-        const printContainer = document.createElement('div');
-        printContainer.style.position = 'absolute';
-        printContainer.style.left = '-12000px'; // fora da tela: com left 0 e 1200px de largura, o documento alargava e a pagina 'pulava' no celular durante a geracao
-        printContainer.style.top = '-9999px';
-        printContainer.style.width = '1200px';
-        printContainer.classList.add('pdf-compact-mode'); // Aplica modo compacto no container
-
-        // <<< A MÁGICA PARA O CSS OFFLINE >>>
-        let styleElement = null; // Variável para guardar o style injetado
-        try {
-            // Tenta buscar o conteúdo do CSS (virá do cache offline)
-            const cssPath = '../../style/style.css'; // Ajuste o caminho se necessário!
-            const response = await fetch(cssPath);
-            if (!response.ok) throw new Error(`CSS não encontrado: ${response.statusText}`);
-            const cssText = await response.text();
-
-            // Cria um elemento <style> e injeta o CSS
-            styleElement = document.createElement('style');
-            styleElement.textContent = cssText;
-            printContainer.appendChild(styleElement); // Adiciona ao container ANTES do clone
-
-        } catch (cssError) {
-            console.error("Erro ao carregar ou injetar CSS para PDF:", cssError);
-            // Continua mesmo sem CSS externo, usando o que tiver
-        }
-        // <<< FIM DA MÁGICA >>>
-        
-        printContainer.appendChild(clone);
-        document.body.appendChild(printContainer);
-        
-        try {
-            await new Promise(resolve => setTimeout(resolve, 200));
-
-            if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) throw new Error("jsPDF não carregado.");
-            const { jsPDF } = window.jspdf;
-
-            // 1. Escala 2 (Qualidade Original) + Fundo Branco na captura
-            const scale = 2;
-            const canvas = await html2canvas(clone, { 
-                scale: scale, 
-                useCORS: true,
-                backgroundColor: '#ffffff' // Garante fundo branco na captura
+            await window.PmePdfDocumento.gerar({
+                vendedor: vendedor,
+                cliente: cliente,
+                dataSimulacao: dataSimulacao,
+                codigoSimulacao: codigoSimulacao,
+                nomeArquivo: 'simulacao_moderfrota.pdf'
             });
-            
-            // 2. Correção da Barra Preta no Canvas de Destino
-            const contentWidth = (clone.offsetWidth + 20) * scale;
-            const contentHeight = canvas.height;
-            
-            const destinationCanvas = document.createElement('canvas');
-            destinationCanvas.width = contentWidth;
-            destinationCanvas.height = contentHeight;
-            const ctx = destinationCanvas.getContext('2d');
-            
-            // --- A CURA DA BARRA PRETA ---
-            // Pintamos todo o fundo de BRANCO antes de desenhar a imagem.
-            // Isso garante que a margem extra (+20) seja branca, não transparente (que vira preta no JPEG).
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, destinationCanvas.width, destinationCanvas.height);
-            
-            // Desenhamos a imagem capturada sobre o fundo branco
-            // Usamos as dimensões originais do canvas para não esticar
-            ctx.drawImage(canvas, 0, 0);
-            
-            // 3. Otimização de Tamanho (JPEG 0.8)
-            // Reduz de ~14MB para ~200-400KB mantendo o layout
-            const imgData = destinationCanvas.toDataURL('image/jpeg', 0.8);
-            
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const margin = 10;
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            const imgWidth = pageWidth - (margin * 2);
-            const imgHeight = (destinationCanvas.height * imgWidth) / destinationCanvas.width;
-            const xOffset = margin;
-            
-            let heightLeft = imgHeight;
-            let position = 0;
-
-            pdf.addImage(imgData, 'JPEG', xOffset, margin, imgWidth, imgHeight);
-            heightLeft -= (pageHeight - margin);
-
-            while (heightLeft > 0) {
-                position -= (pageHeight - (margin * 2));
-                pdf.addPage();
-                pdf.addImage(imgData, 'JPEG', xOffset, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-            }
-            
-            // Lembre-se de ajustar o nome do arquivo para cada simulador (ex: simulacao_pronaf.pdf)
-            pdf.save('simulacao_moderfrota.pdf');
-
         } catch (error) {
-            console.error("Erro ao gerar PDF:", error);
-            alert("Ocorreu um erro ao gerar o PDF.");
+            console.error('Erro ao gerar PDF:', error);
+            alert('Ocorreu um erro ao gerar o PDF.');
         } finally {
-            // PASSO 6: Limpeza
-            if (printContainer && printContainer.parentNode === document.body) {
-                document.body.removeChild(printContainer); // Remove o container com clone e style
-            }
             btnGerarPdf.textContent = originalButtonText;
             btnGerarPdf.disabled = false;
         }

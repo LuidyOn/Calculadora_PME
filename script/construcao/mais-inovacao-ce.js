@@ -434,147 +434,32 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${dia}${mes}${ano}${String(totalVendedor).padStart(2, '0')}${String(totalCliente).padStart(2, '0')}${String(somaFinal).padStart(4, '0')}`;
     }
 
+    // Geração do PDF: documento vetorial desenhado pelo módulo comum
+    // (script/pdf-documento.js), que lê os valores exibidos na página.
     async function generatePdf(vendedor, cliente, cpfFinal) {
-        const originalElement = document.getElementById('capture');
+        const btnGerarPdf = document.getElementById('btn-gerar-pdf');
         const originalButtonText = btnGerarPdf.textContent;
 
         btnGerarPdf.textContent = 'Gerando...';
         btnGerarPdf.disabled = true;
 
-        const clone = originalElement.cloneNode(true);
-        const clonedActionsDiv = clone.querySelector('.actions');
-        if (clonedActionsDiv) clonedActionsDiv.style.display = 'none';
+        try {
+            if (!window.PmePdfDocumento) throw new Error('Gerador de PDF não carregado.');
 
-        const elementosParaRemoverDoPdf = clone.querySelectorAll('.header-home-link, .floating-home-link');
-        elementosParaRemoverDoPdf.forEach(elemento => elemento.remove());
-
-        const originalLogo = document.querySelector('.logo-image');
-        const clonedLogo = clone.querySelector('.logo-image');
-
-        if (originalLogo && clonedLogo && originalLogo.complete) {
-            try {
-                const canvasLogo = document.createElement('canvas');
-                canvasLogo.width = originalLogo.naturalWidth;
-                canvasLogo.height = originalLogo.naturalHeight;
-                const ctxLogo = canvasLogo.getContext('2d');
-                ctxLogo.drawImage(originalLogo, 0, 0);
-                clonedLogo.src = canvasLogo.toDataURL('image/png');
-            } catch (err) {
-                console.warn('Erro ao converter logo para PDF:', err);
-            }
-        }
-
-        const dateInputs = clone.querySelectorAll('input[type="date"]');
-        dateInputs.forEach(input => {
-            if (input.value) {
-                const span = document.createElement('span');
-                const [ano, mes, dia] = input.value.split('-');
-                span.textContent = `${dia}/${mes}/${ano}`;
-                span.className = input.className;
-                span.style.cssText = window.getComputedStyle(input).cssText;
-                span.style.border = '1px solid #ccc';
-                span.style.display = 'flex';
-                span.style.alignItems = 'center';
-                span.style.justifyContent = 'flex-end';
-                input.parentNode.replaceChild(span, input);
-            }
-        });
-
-        const header = clone.querySelector('header');
-        if (header) {
-            const infoDiv = document.createElement('div');
             const dataSimulacao = new Date();
-            const dataSimulacaoTexto = dataSimulacao.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
             const codigoSimulacao = gerarCodigoSimulacao(dataSimulacao, vendedor, cliente, cpfFinal);
 
-            infoDiv.className = 'pdf-info';
-            infoDiv.innerHTML = `
-                <p><strong>Vendedor:</strong> ${vendedor}</p>
-                <p><strong>Cliente:</strong> ${cliente}</p>
-                <p><strong>Data da Simulação:</strong> ${dataSimulacaoTexto}</p>
-                <p><strong>Código da Simulação:</strong> ${codigoSimulacao}</p>
-            `;
-            header.appendChild(infoDiv);
-        }
-
-        const printContainer = document.createElement('div');
-        printContainer.style.position = 'absolute';
-        printContainer.style.left = '-12000px'; // fora da tela: com left 0 e 1200px de largura, o documento alargava e a pagina 'pulava' no celular durante a geracao
-        printContainer.style.top = '-9999px';
-        printContainer.style.width = '1200px';
-        printContainer.classList.add('pdf-compact-mode');
-
-        try {
-            const response = await fetch('../../style/style.css');
-            const cssText = await response.text();
-            const styleElement = document.createElement('style');
-            styleElement.textContent = cssText;
-            printContainer.appendChild(styleElement);
-        } catch (cssError) {
-            console.error('Erro ao carregar CSS para PDF:', cssError);
-        }
-
-        printContainer.appendChild(clone);
-        document.body.appendChild(printContainer);
-
-        try {
-            await new Promise(resolve => setTimeout(resolve, 200));
-
-            if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
-                throw new Error('jsPDF não carregado.');
-            }
-
-            const { jsPDF } = window.jspdf;
-            const scale = 2;
-            const canvas = await html2canvas(clone, {
-                scale,
-                useCORS: true,
-                backgroundColor: '#ffffff'
+            await window.PmePdfDocumento.gerar({
+                vendedor: vendedor,
+                cliente: cliente,
+                dataSimulacao: dataSimulacao,
+                codigoSimulacao: codigoSimulacao,
+                nomeArquivo: 'simulacao_finame-inovacao.pdf'
             });
-
-            const contentWidth = (clone.offsetWidth + 20) * scale;
-            const contentHeight = canvas.height;
-
-            const destinationCanvas = document.createElement('canvas');
-            destinationCanvas.width = contentWidth;
-            destinationCanvas.height = contentHeight;
-            const ctx = destinationCanvas.getContext('2d');
-
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, destinationCanvas.width, destinationCanvas.height);
-            ctx.drawImage(canvas, 0, 0);
-
-            const imgData = destinationCanvas.toDataURL('image/jpeg', 0.8);
-
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const margin = 10;
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            const imgWidth = pageWidth - (margin * 2);
-            const imgHeight = (destinationCanvas.height * imgWidth) / destinationCanvas.width;
-            const xOffset = margin;
-
-            let heightLeft = imgHeight;
-            let position = 0;
-
-            pdf.addImage(imgData, 'JPEG', xOffset, margin, imgWidth, imgHeight);
-            heightLeft -= (pageHeight - margin);
-
-            while (heightLeft > 0) {
-                position -= (pageHeight - (margin * 2));
-                pdf.addPage();
-                pdf.addImage(imgData, 'JPEG', xOffset, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-            }
-
-            pdf.save('simulacao_finame-inovacao.pdf');
         } catch (error) {
             console.error('Erro ao gerar PDF:', error);
             alert('Ocorreu um erro ao gerar o PDF.');
         } finally {
-            if (printContainer && printContainer.parentNode === document.body) {
-                document.body.removeChild(printContainer);
-            }
             btnGerarPdf.textContent = originalButtonText;
             btnGerarPdf.disabled = false;
         }

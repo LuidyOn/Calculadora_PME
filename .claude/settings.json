@@ -6,7 +6,13 @@
       "Bash(tasklist //FI \"IMAGENAME eq python.exe\" //FO CSV)",
       "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 8765,8766 -State Listen -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique\")",
       "Bash(taskkill //PID 8472 //F)",
-      "Bash(taskkill //PID 29452 //F)"
+      "Bash(taskkill //PID 29452 //F)",
+      "Bash(python \"C:/Users/LUIZ~1.FER/AppData/Local/Temp/claude/c--Users-luiz-ferreira-Workspace-C-digos-PME-Calculadora-PME/7c763d74-8c6e-484b-a683-c01553004803/scratchpad/trocar_pdf.py\")",
+      "Bash(python gerar_pdf.py \"HTMLs/construcao/mais-inovacao-ce.html\" pdf_inova)",
+      "Bash(python -c \"import fitz; print\\('pymupdf ok'\\)\")",
+      "Bash(python -m pip install --quiet pymupdf)",
+      "Bash(python -c \"import fitz; print\\('pymupdf ok', fitz.__doc__[:40]\\)\")",
+      "Bash(python validar_dados.py)"
     ]
   }
 }
